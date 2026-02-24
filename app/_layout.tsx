@@ -1,39 +1,108 @@
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/lib/supabase";
+import * as Linking from "expo-linking";
 import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect, useState } from "react";
+import * as WebBrowser from "expo-web-browser";
+import { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-export default function RootLayout() {
+WebBrowser.maybeCompleteAuthSession();
+
+// ── OAuth deep link handler ───────────────────
+// Catches smartory://auth/callback after Google sign-in
+// and hands the tokens to Supabase
+
+function useOAuthDeepLink() {
+  useEffect(() => {
+    Linking.getInitialURL().then((url) => {
+      if (url) handleAuthUrl(url);
+    });
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      handleAuthUrl(url);
+    });
+
+    return () => subscription.remove();
+  }, []);
+}
+
+async function handleAuthUrl(url: string) {
+  if (!url.includes("auth/callback") && !url.includes("access_token")) return;
+
+  try {
+    const fragmentIndex = url.indexOf("#");
+    const queryIndex = url.indexOf("?");
+    const paramsString =
+      fragmentIndex !== -1
+        ? url.slice(fragmentIndex + 1)
+        : url.slice(queryIndex + 1);
+
+    const params = Object.fromEntries(new URLSearchParams(paramsString));
+
+    if (params.access_token && params.refresh_token) {
+      await supabase.auth.setSession({
+        access_token: params.access_token,
+        refresh_token: params.refresh_token,
+      });
+    }
+  } catch (err) {
+    console.error("[handleAuthUrl] Failed to set session from deep link:", err);
+  }
+}
+
+// ── Auth guard ────────────────────────────────
+// Replaces your mock isSignedIn logic with real session state
+
+function AuthGuard() {
+  const { session, loading } = useSession();
   const segments = useSegments();
   const router = useRouter();
 
-  // 1. Add a state to track if the layout is mounted
-  const [isReady, setIsReady] = useState(false);
-
-  // Mock authentication state
-  const isSignedIn = false;
-
   useEffect(() => {
-    // Set ready on first mount
-    setIsReady(true);
-  }, []);
-
-  useEffect(() => {
-    // 2. Only navigate if the layout is ready
-    if (!isReady) return;
+    if (loading) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    if (!isSignedIn && !inAuthGroup) {
-      router.replace("/login");
-    } else if (isSignedIn && inAuthGroup) {
+    if (!session && !inAuthGroup) {
+      router.replace("/(auth)/login");
+    } else if (session && inAuthGroup) {
       router.replace("/(tabs)");
     }
-  }, [isSignedIn, segments, isReady]);
+  }, [session, loading, segments]);
 
-  // 3. Render the Stack - this MUST be present for the navigator to mount
+  return null;
+}
+
+// ── Root Layout ───────────────────────────────
+
+export default function RootLayout() {
+  const { loading } = useSession();
+
+  useOAuthDeepLink();
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#061a18",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ActivityIndicator color="#14b8a6" size="large" />
+      </View>
+    );
+  }
+
   return (
-    <Stack>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <SafeAreaProvider>
+      <AuthGuard />
+      <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </SafeAreaProvider>
   );
 }

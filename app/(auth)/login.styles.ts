@@ -1,18 +1,17 @@
 import { StyleSheet } from "react-native";
 
-// ── Design Tokens (inline for portability) ────
 const T = {
-  bg: "#061a18", // Deep teal-black
-  bgCard: "#0c2825", // Slightly lighter for card
-  teal: "#14b8a6", // Primary teal
+  bg: "#061a18",
+  bgCard: "#0c2825",
+  teal: "#14b8a6",
   tealDim: "#0d9488",
   tealGlow: "#14b8a620",
   tealBorder: "#14b8a630",
   tealBorderFocus: "#14b8a6",
-  text: "#e2f4f2", // Warm off-white
+  text: "#e2f4f2",
   textMuted: "#7ab8b2",
   textDim: "#4b7b78",
-  amber: "#f59e0b", // Accent
+  amber: "#f59e0b",
   white: "#ffffff",
 };
 
@@ -25,27 +24,20 @@ export const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-    paddingHorizontal: 24,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
-    gap: 32,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    gap: 28,
     maxWidth: 460,
     width: "100%",
     alignSelf: "center",
   },
 
-  // ── Grid overlay (dot pattern via borders trick) ──
-  gridOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.04,
-    // The dot grid is achieved purely visually via particle components above.
-    // Add a real SVG/Canvas here if needed for web.
-  },
-
   // ── Brand section ─────────────────────────
   brandSection: {
-    gap: 16,
+    gap: 14,
   },
   logoRow: {
     flexDirection: "row",
@@ -60,22 +52,19 @@ export const styles = StyleSheet.create({
   },
   tagline: {
     color: T.text,
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "800",
     letterSpacing: -1,
-    lineHeight: 38,
-    marginTop: 4,
+    lineHeight: 34,
   },
-
-  // ── Teaser stats ──────────────────────────
   statsRow: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 4,
+    gap: 8,
+    flexWrap: "wrap",
   },
   statPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: T.tealBorder,
@@ -84,7 +73,7 @@ export const styles = StyleSheet.create({
   },
   statValue: {
     color: T.teal,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
     letterSpacing: -0.3,
   },
@@ -95,38 +84,60 @@ export const styles = StyleSheet.create({
     marginTop: 1,
   },
 
-  // ── Glass card ────────────────────────────
+  // ── Card ──────────────────────────────────
   card: {
     backgroundColor: T.bgCard,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: T.tealBorder,
-    padding: 28,
-    // iOS shadow
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 28,
     shadowColor: T.teal,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 32,
-    // Android
     elevation: 8,
-    gap: 4,
   },
-  cardTitle: {
+
+  // ── Tabs ──────────────────────────────────
+  tabRow: {
+    flexDirection: "row",
+    marginBottom: 0,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  tabLabel: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: T.textDim,
+    letterSpacing: -0.2,
+  },
+  tabLabelActive: {
     color: T.text,
-    fontSize: 22,
     fontWeight: "700",
-    letterSpacing: -0.5,
   },
-  cardSubtitle: {
-    color: T.textMuted,
-    fontSize: 14,
-    marginBottom: 16,
-    marginTop: 2,
+  tabUnderline: {
+    height: 2,
+    backgroundColor: T.tealBorder,
+    borderRadius: 1,
+    marginBottom: 22,
+    overflow: "hidden",
+  },
+  tabUnderlineActive: {
+    position: "absolute",
+    width: "50%",
+    height: "100%",
+    backgroundColor: T.teal,
+    borderRadius: 1,
   },
 
   // ── Form ──────────────────────────────────
   form: {
-    gap: 16,
+    gap: 14,
   },
   fieldGroup: {
     gap: 6,
@@ -138,7 +149,7 @@ export const styles = StyleSheet.create({
   },
   fieldLabel: {
     color: T.textMuted,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     letterSpacing: 0.8,
     textTransform: "uppercase",
@@ -156,7 +167,7 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: T.tealBorder,
     paddingHorizontal: 14,
-    height: 52,
+    height: 50,
     gap: 10,
   },
   inputWrapFocused: {
@@ -185,11 +196,11 @@ export const styles = StyleSheet.create({
   button: {
     backgroundColor: T.teal,
     borderRadius: 14,
-    height: 54,
+    height: 52,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 4,
+    marginTop: 2,
     gap: 8,
     shadowColor: T.teal,
     shadowOffset: { width: 0, height: 4 },
@@ -199,17 +210,53 @@ export const styles = StyleSheet.create({
   },
   buttonText: {
     color: T.bg,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
     letterSpacing: -0.3,
   },
   buttonArrow: {
     color: T.bg,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "700",
   },
 
-  // ── Sign up hint ──────────────────────────
+  // ── Divider ───────────────────────────────
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#14b8a620",
+  },
+  dividerText: {
+    color: T.textDim,
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+
+  // ── Grid overlay ──────────────────────────
+  gridOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.04,
+  },
+
+  // ── Legacy (kept for StatPill/ComingSoonModal) ──
+  cardTitle: {
+    color: T.text,
+    fontSize: 22,
+    fontWeight: "700",
+    letterSpacing: -0.5,
+  },
+  cardSubtitle: {
+    color: T.textMuted,
+    fontSize: 14,
+    marginBottom: 16,
+    marginTop: 2,
+  },
   signupHint: {
     color: T.textDim,
     fontSize: 13,
