@@ -1,4 +1,6 @@
 import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
+import { CURRENCY_SYMBOLS, CurrencyCode } from "@/constants/currencies";
+import { convertAmount, ExchangeRates } from "@/lib/currency.service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,18 +15,6 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "all", label: "All Time" },
 ];
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  AUD: "A$",
-  INR: "₹",
-  CHF: "Fr ",
-  CNY: "¥",
-};
-
 function filterByTab(receipts: Receipt[], tab: Tab): Receipt[] {
   if (tab === "all") return receipts;
   const now = new Date();
@@ -38,36 +28,48 @@ function filterByTab(receipts: Receipt[], tab: Tab): Receipt[] {
   });
 }
 
-type Props = { receipts: Receipt[]; theme: SemanticTheme };
+type Props = {
+  receipts: Receipt[];
+  theme: SemanticTheme;
+  preferredCurrency: CurrencyCode;
+  rates: ExchangeRates;
+};
 
-export function SpendBreakdown({ receipts, theme }: Props) {
+export function SpendBreakdown({
+  receipts,
+  theme,
+  preferredCurrency,
+  rates,
+}: Props) {
   const [tab, setTab] = useState<Tab>("month");
   const [activeCat, setActiveCat] = useState<string | null>(null);
 
   const filtered = filterByTab(receipts, tab);
 
-  // Primary symbol from filtered set
-  const spendByCurrency: Record<string, number> = {};
-  for (const r of filtered) {
-    const cur = r.raw_response.currency ?? "USD";
-    spendByCurrency[cur] = (spendByCurrency[cur] ?? 0) + r.total_amount;
-  }
-  const primaryCur =
-    Object.entries(spendByCurrency).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-    "USD";
-  const symbol = CURRENCY_SYMBOLS[primaryCur] ?? primaryCur + " ";
-  const totalSpend = spendByCurrency[primaryCur] ?? 0;
+  const symbol = CURRENCY_SYMBOLS[preferredCurrency] ?? preferredCurrency + " ";
 
-  // Category spend + item stats for the active tab
+  // Total spend converted to preferred currency
+  const totalSpend = filtered.reduce((sum, r) => {
+    const from = r.raw_response.currency ?? "USD";
+    return sum + convertAmount(r.total_amount, from, preferredCurrency, rates);
+  }, 0);
+
+  // Category spend + item stats, amounts converted to preferred currency
   const catData: Record<
     string,
     { spend: number; items: number; trips: Set<string> }
   > = {};
   for (const r of filtered) {
+    const fromCur = r.raw_response.currency ?? "USD";
     for (const item of r.items) {
       if (!catData[item.category])
         catData[item.category] = { spend: 0, items: 0, trips: new Set() };
-      catData[item.category].spend += item.price * item.quantity;
+      catData[item.category].spend += convertAmount(
+        item.price * item.quantity,
+        fromCur,
+        preferredCurrency,
+        rates,
+      );
       catData[item.category].items += item.quantity;
       catData[item.category].trips.add(r.id);
     }

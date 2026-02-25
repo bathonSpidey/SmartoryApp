@@ -1,8 +1,9 @@
 import { Colors, Radius, Spacing, Typography } from "@/constants/Themes";
+import { CURRENCY_OPTIONS, CurrencyCode } from "@/constants/currencies";
 import { useThemeContext, type ThemeMode } from "@/contexts/ThemeContext";
 import { useSession } from "@/hooks/useSession";
+import { useUserCurrency } from "@/hooks/useUserCurrency";
 import { supabase } from "@/lib/supabase";
-import { CurrencyCode, updateUserCurrency } from "@/lib/user.service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -25,28 +26,6 @@ type MenuItem = {
   onPress: () => void;
 };
 
-const CURRENCY_OPTIONS: {
-  code: CurrencyCode;
-  label: string;
-  symbol: string;
-}[] = [
-  { code: "USD", label: "US Dollar", symbol: "$" },
-  { code: "EUR", label: "Euro", symbol: "€" },
-  { code: "GBP", label: "British Pound", symbol: "£" },
-  { code: "INR", label: "Indian Rupee", symbol: "₹" },
-  { code: "JPY", label: "Japanese Yen", symbol: "¥" },
-  { code: "CAD", label: "Canadian Dollar", symbol: "C$" },
-  { code: "AUD", label: "Australian Dollar", symbol: "A$" },
-  { code: "CHF", label: "Swiss Franc", symbol: "Fr" },
-  { code: "CNY", label: "Chinese Yuan", symbol: "¥" },
-  { code: "SGD", label: "Singapore Dollar", symbol: "S$" },
-  { code: "AED", label: "UAE Dirham", symbol: "د.إ" },
-  { code: "BRL", label: "Brazilian Real", symbol: "R$" },
-  { code: "MXN", label: "Mexican Peso", symbol: "MX$" },
-  { code: "KRW", label: "South Korean Won", symbol: "₩" },
-  { code: "SEK", label: "Swedish Krona", symbol: "kr" },
-];
-
 const THEME_OPTIONS: {
   mode: ThemeMode;
   label: string;
@@ -64,20 +43,23 @@ export default function ProfileScreen() {
   const userEmail = session?.user?.email ?? "";
   const initial = userEmail ? userEmail.charAt(0).toUpperCase() : "?";
 
+  const { currency: savedCurrency, update: updateCurrency } = useUserCurrency();
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>("USD");
   const [savingCurrency, setSavingCurrency] = useState(false);
   const [currencySaved, setCurrencySaved] = useState(false);
 
+  // Sync selected state when backend preference loads
+  React.useEffect(() => {
+    setSelectedCurrency(savedCurrency);
+  }, [savedCurrency]);
+
   const handleSaveCurrency = async () => {
     setSavingCurrency(true);
     setCurrencySaved(false);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) throw new Error("Not authenticated");
-      await updateUserCurrency(token, selectedCurrency);
+      await updateCurrency(selectedCurrency);
       setCurrencySaved(true);
       setTimeout(() => setCurrencySaved(false), 2000);
     } catch (e) {

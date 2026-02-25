@@ -5,22 +5,29 @@
 
 const BASE_URL = "http://127.0.0.1:8000";
 
-export type CurrencyCode =
-  | "USD"
-  | "EUR"
-  | "GBP"
-  | "JPY"
-  | "CAD"
-  | "AUD"
-  | "INR"
-  | "CHF"
-  | "CNY"
-  | "SGD"
-  | "AED"
-  | "BRL"
-  | "MXN"
-  | "KRW"
-  | "SEK";
+import { CurrencyCode } from "@/constants/currencies";
+export type { CurrencyCode };
+
+/**
+ * Fetches the stored preferred currency for the authenticated user.
+ * GET /user/currency → { currency: "EUR" }
+ * Falls back to "USD" if the endpoint is unavailable or returns nothing.
+ */
+export async function getUserCurrency(token: string): Promise<CurrencyCode> {
+  try {
+    const res = await fetch(`${BASE_URL}/user/currency`, {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) return "USD";
+    const data = await res.json();
+    return (data?.currency as CurrencyCode) ?? "USD";
+  } catch {
+    return "USD";
+  }
+}
 
 /**
  * Updates the preferred currency for the authenticated user.

@@ -236,17 +236,7 @@ function relativeDate(raw: string): string {
   });
 }
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  AUD: "A$",
-  CHF: "Fr ",
-  INR: "₹",
-  CNY: "¥",
-};
+import { CURRENCY_SYMBOLS } from "@/constants/currencies";
 
 // ── styles ───────────────────────────────────
 

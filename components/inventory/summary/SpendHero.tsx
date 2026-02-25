@@ -1,41 +1,39 @@
 import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
+import { CURRENCY_SYMBOLS, CurrencyCode } from "@/constants/currencies";
+import { convertAmount, ExchangeRates } from "@/lib/currency.service";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Receipt } from "../types";
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  AUD: "A$",
-  INR: "₹",
-  CHF: "Fr ",
-  CNY: "¥",
-};
-
 function titleCase(s: string) {
   return s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-type Props = { receipts: Receipt[]; theme: SemanticTheme };
+type Props = {
+  receipts: Receipt[];
+  theme: SemanticTheme;
+  preferredCurrency: CurrencyCode;
+  rates: ExchangeRates;
+};
 
-export function SpendHero({ receipts, theme }: Props) {
+export function SpendHero({
+  receipts,
+  theme,
+  preferredCurrency,
+  rates,
+}: Props) {
   const totalItems = receipts.reduce((s, r) => s + r.items.length, 0);
   const uniqueStores = new Set(receipts.map((r) => r.store_name.toLowerCase()))
     .size;
 
-  const spendByCurrency: Record<string, number> = {};
-  for (const r of receipts) {
-    const cur = r.raw_response.currency ?? "USD";
-    spendByCurrency[cur] = (spendByCurrency[cur] ?? 0) + r.total_amount;
-  }
-  const [[primaryCur, total]] = Object.entries(spendByCurrency).sort(
-    (a, b) => b[1] - a[1],
-  );
-  const symbol = CURRENCY_SYMBOLS[primaryCur] ?? primaryCur + " ";
+  // Sum all receipts converted to the preferred currency
+  const totalConverted = receipts.reduce((sum, r) => {
+    const from = r.raw_response.currency ?? "USD";
+    return sum + convertAmount(r.total_amount, from, preferredCurrency, rates);
+  }, 0);
+
+  const symbol = CURRENCY_SYMBOLS[preferredCurrency] ?? preferredCurrency + " ";
 
   const biggest = receipts.reduce(
     (mx, r) => (r.total_amount > mx.total_amount ? r : mx),
@@ -47,7 +45,7 @@ export function SpendHero({ receipts, theme }: Props) {
       <Text style={s.label}>You've spent</Text>
       <Text style={s.amount}>
         {symbol}
-        {total.toLocaleString("en-US", {
+        {totalConverted.toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}

@@ -70,17 +70,7 @@ function titleCase(str: string) {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  AUD: "A$",
-  CHF: "Fr",
-  INR: "₹",
-  CNY: "¥",
-};
+import { CURRENCY_SYMBOLS } from "@/constants/currencies";
 
 const styles = StyleSheet.create({
   bubble: {
