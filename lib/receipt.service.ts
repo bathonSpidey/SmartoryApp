@@ -113,6 +113,24 @@ export type GetReceiptsResponse = {
 };
 
 /**
+ * Deletes a saved receipt by ID.
+ */
+export async function deleteReceipt(
+  token: string,
+  receiptId: string,
+): Promise<void> {
+  const res = await fetch(`${BASE_URL}/receipts/${receiptId}`, {
+    method: "DELETE",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error(`Delete failed: ${res.status}`);
+}
+
+/**
  * Fetches all saved receipts for the authenticated user.
  */
 export async function getReceipts(token: string): Promise<SavedReceipt[]> {

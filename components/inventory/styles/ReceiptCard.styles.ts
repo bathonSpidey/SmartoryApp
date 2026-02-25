@@ -24,6 +24,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     gap: Spacing.sm,
   },
+  headerPressable: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
   avatar: {
     width: 44,
     height: 44,
@@ -102,6 +108,16 @@ export const styles = StyleSheet.create({
   itemCountText: {
     fontSize: 11,
     fontWeight: "700",
+  },
+
+  // ── Delete button ──
+  deleteBtn: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
   },
 
   // ── Items list ──

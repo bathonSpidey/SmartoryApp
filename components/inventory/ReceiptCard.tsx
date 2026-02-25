@@ -7,13 +7,17 @@
 // ─────────────────────────────────────────────
 
 import { SemanticTheme } from "@/constants/Themes";
+import { deleteReceipt } from "@/lib/receipt.service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   LayoutAnimation,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
+  StyleSheet,
   Text,
   UIManager,
   View,
@@ -32,6 +36,10 @@ if (Platform.OS === "android") {
 type Props = {
   receipt: Receipt;
   theme: SemanticTheme;
+  /** Bearer token for authenticated API calls */
+  token: string;
+  /** Called after successful deletion so the parent can remove this card */
+  onDelete?: (id: string) => void;
   /** Start expanded — useful for single-receipt views */
   defaultExpanded?: boolean;
 };
@@ -39,9 +47,14 @@ type Props = {
 export function ReceiptCard({
   receipt,
   theme,
+  token,
+  onDelete,
   defaultExpanded = false,
 }: Props) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const storeColor = getStoreColor(receipt.store_name);
   const currency = receipt.raw_response.currency ?? "USD";
@@ -66,6 +79,25 @@ export function ReceiptCard({
     setExpanded((v) => !v);
   }
 
+  function confirmDelete() {
+    setDeleteError(null);
+    setConfirmVisible(true);
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteReceipt(token, receipt.id);
+      setConfirmVisible(false);
+      onDelete?.(receipt.id);
+    } catch (e) {
+      setDeleteError("Failed to delete receipt. Please try again.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <View
       style={[
@@ -83,63 +115,85 @@ export function ReceiptCard({
       {/* ── Card body ── */}
       <View style={styles.body}>
         {/* ── Header row (pressable) ── */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.headerRow,
-            pressed && { opacity: 0.75 },
-          ]}
-          onPress={toggle}
-          hitSlop={8}
-        >
-          {/* Store avatar */}
-          <View
-            style={[
-              styles.avatar,
+        <View style={styles.headerRow}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.headerPressable,
+              pressed && { opacity: 0.75 },
+            ]}
+            onPress={toggle}
+            hitSlop={8}
+          >
+            {/* Store avatar */}
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: storeColor + "22",
+                  borderColor: storeColor + "55",
+                },
+              ]}
+            >
+              <Text style={[styles.avatarLetter, { color: storeColor }]}>
+                {storeInitial}
+              </Text>
+            </View>
+
+            {/* Store info */}
+            <View style={styles.storeInfo}>
+              <Text
+                style={[styles.storeName, { color: theme.text }]}
+                numberOfLines={1}
+              >
+                {titleCase(receipt.store_name)}
+              </Text>
+              <Text style={[styles.dateText, { color: theme.textMuted }]}>
+                {date}
+              </Text>
+            </View>
+
+            {/* Total + chevron */}
+            <View style={styles.totalCol}>
+              <Text style={[styles.totalAmount, { color: theme.text }]}>
+                {symbol}
+                {receipt.total_amount.toFixed(2)}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.chevronBox,
+                { backgroundColor: theme.surfaceElevated },
+              ]}
+            >
+              <Ionicons
+                name={expanded ? "chevron-up" : "chevron-down"}
+                size={14}
+                color={theme.textMuted}
+              />
+            </View>
+          </Pressable>
+
+          {/* Delete button — outside header Pressable so it gets its own tap */}
+          <Pressable
+            onPress={confirmDelete}
+            disabled={deleting}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.deleteBtn,
               {
-                backgroundColor: storeColor + "22",
-                borderColor: storeColor + "55",
+                backgroundColor: "#ff3b3022",
+                opacity: pressed || deleting ? 0.5 : 1,
               },
             ]}
           >
-            <Text style={[styles.avatarLetter, { color: storeColor }]}>
-              {storeInitial}
-            </Text>
-          </View>
-
-          {/* Store info */}
-          <View style={styles.storeInfo}>
-            <Text
-              style={[styles.storeName, { color: theme.text }]}
-              numberOfLines={1}
-            >
-              {titleCase(receipt.store_name)}
-            </Text>
-            <Text style={[styles.dateText, { color: theme.textMuted }]}>
-              {date}
-            </Text>
-          </View>
-
-          {/* Total + chevron */}
-          <View style={styles.totalCol}>
-            <Text style={[styles.totalAmount, { color: theme.text }]}>
-              {symbol}
-              {receipt.total_amount.toFixed(2)}
-            </Text>
-          </View>
-
-          <View
-            style={[
-              styles.chevronBox,
-              { backgroundColor: theme.surfaceElevated },
-            ]}
-          >
             <Ionicons
-              name={expanded ? "chevron-up" : "chevron-down"}
+              name={deleting ? "hourglass-outline" : "trash-outline"}
               size={14}
-              color={theme.textMuted}
+              color="#ff3b30"
             />
-          </View>
-        </Pressable>
+          </Pressable>
+        </View>
 
         {/* ── Divider ── */}
         <View style={[styles.divider, { backgroundColor: theme.border }]} />
@@ -191,6 +245,81 @@ export function ReceiptCard({
           </View>
         )}
       </View>
+
+      {/* ── Delete confirmation modal ── */}
+      <Modal
+        visible={confirmVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => !deleting && setConfirmVisible(false)}
+      >
+        <Pressable
+          style={ds.overlay}
+          onPress={() => !deleting && setConfirmVisible(false)}
+        >
+          <Pressable
+            style={[
+              ds.card,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            {/* Icon */}
+            <View style={ds.iconWrap}>
+              <Ionicons name="trash-outline" size={28} color="#ff3b30" />
+            </View>
+
+            <Text style={[ds.title, { color: theme.text }]}>
+              Delete Receipt
+            </Text>
+            <Text style={[ds.message, { color: theme.textMuted }]}>
+              Remove the receipt from{" "}
+              <Text style={{ fontWeight: "700" }}>
+                {titleCase(receipt.store_name)}
+              </Text>
+              ? This cannot be undone.
+            </Text>
+
+            {deleteError && <Text style={ds.errorText}>{deleteError}</Text>}
+
+            <View style={ds.actions}>
+              <Pressable
+                onPress={() => setConfirmVisible(false)}
+                disabled={deleting}
+                style={({ pressed }) => [
+                  ds.btn,
+                  {
+                    backgroundColor: theme.background,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                    opacity: pressed ? 0.7 : 1,
+                  },
+                ]}
+              >
+                <Text style={[ds.btnCancelText, { color: theme.text }]}>
+                  Cancel
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleDelete}
+                disabled={deleting}
+                style={({ pressed }) => [
+                  ds.btn,
+                  ds.btnDanger,
+                  { opacity: pressed || deleting ? 0.7 : 1 },
+                ]}
+              >
+                {deleting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={ds.btnDangerText}>Delete</Text>
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -252,3 +381,70 @@ function relativeDate(raw: string): string {
 }
 
 import { CURRENCY_SYMBOLS } from "@/constants/currencies";
+
+// ── Delete modal styles ───────────────────────
+const ds = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  card: {
+    width: "100%",
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 24,
+    alignItems: "center",
+    gap: 8,
+  },
+  iconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#ff3b3018",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: "700",
+  },
+  message: {
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  errorText: {
+    fontSize: 13,
+    color: "#ff3b30",
+    textAlign: "center",
+  },
+  actions: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 8,
+    width: "100%",
+  },
+  btn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  btnCancelText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  btnDanger: {
+    backgroundColor: "#ff3b30",
+  },
+  btnDangerText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+});

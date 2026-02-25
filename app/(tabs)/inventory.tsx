@@ -85,7 +85,12 @@ function applySort(
   });
 }
 
-type Section = { label: string; data: Receipt[]; isOlder?: boolean; isSortable?: boolean };
+type Section = {
+  label: string;
+  data: Receipt[];
+  isOlder?: boolean;
+  isSortable?: boolean;
+};
 
 function groupByRecency(receipts: Receipt[]): Section[] {
   const now = new Date();
@@ -122,7 +127,15 @@ function groupByRecency(receipts: Receipt[]): Section[] {
 export default function InventoryScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { receipts, loading, refreshing, error, refresh } = useReceipts();
+  const {
+    receipts,
+    loading,
+    refreshing,
+    error,
+    refresh,
+    token,
+    removeReceipt,
+  } = useReceipts();
   const [sortOption, setSortOption] = useState<SortOption>(SORT_OPTIONS[0]);
   const [sortModalVisible, setSortModalVisible] = useState(false);
 
@@ -242,6 +255,8 @@ export default function InventoryScreen() {
                         key={receipt.id}
                         receipt={receipt}
                         theme={theme}
+                        token={token ?? ""}
+                        onDelete={removeReceipt}
                       />
                     ))}
                   </React.Fragment>

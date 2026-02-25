@@ -7,6 +7,7 @@ export function useReceipts() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   const fetchReceipts = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -15,15 +16,20 @@ export function useReceipts() {
 
     try {
       const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) throw new Error("Not authenticated");
-      setReceipts(await getReceipts(token));
+      const t = sessionData.session?.access_token;
+      if (!t) throw new Error("Not authenticated");
+      setToken(t);
+      setReceipts(await getReceipts(t));
     } catch (err: any) {
       setError(err.message ?? "Failed to load receipts");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
+  }, []);
+
+  const removeReceipt = useCallback((id: string) => {
+    setReceipts((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
   useEffect(() => {
@@ -35,6 +41,8 @@ export function useReceipts() {
     loading,
     refreshing,
     error,
+    token,
+    removeReceipt,
     refresh: () => fetchReceipts(true),
   };
 }
