@@ -1,31 +1,36 @@
-import { StyleSheet } from 'react-native';
+import HomeHeader from "@/components/home/HomeHeader";
+import QuickActions from "@/components/home/QuickActions";
+import RecentActivity from "@/components/home/RecentActivity";
+import StatsRow from "@/components/home/StatsRow";
+import { ThemeDark } from "@/constants/Themes";
+import { useSession } from "@/hooks/useSession";
+import React from "react";
+import { ScrollView, StyleSheet } from "react-native";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function HomeScreen() {
+  const { session } = useSession();
+  const userEmail = session?.user?.email ?? "";
 
-export default function TabOneScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      <HomeHeader userEmail={userEmail} notificationCount={3} />
+      <StatsRow />
+      <QuickActions />
+      <RecentActivity />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: ThemeDark.background,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  content: {
+    flexGrow: 1,
   },
 });
