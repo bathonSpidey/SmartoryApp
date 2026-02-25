@@ -1,4 +1,5 @@
-import { Colors, Radius, ThemeDark, Typography } from "@/constants/Themes";
+import { Colors, Radius, Typography } from "@/constants/Themes";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React from "react";
@@ -44,10 +45,18 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Navbar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   return (
     <View
-      style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8) }]}
+      style={[
+        styles.container,
+        {
+          paddingBottom: Math.max(insets.bottom, 8),
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+        },
+      ]}
     >
       {state.routes.map((route, index) => {
         const item = NAV_ITEMS[index];
@@ -75,13 +84,18 @@ export default function Navbar({ state, navigation }: BottomTabBarProps) {
               <View
                 style={[
                   styles.scanButton,
-                  isFocused && styles.scanButtonActive,
+                  {
+                    backgroundColor: isFocused
+                      ? theme.primaryDim
+                      : theme.primary,
+                    shadowColor: theme.primary,
+                  },
                 ]}
               >
                 <Ionicons
                   name={isFocused ? item.iconFocused : item.icon}
                   size={26}
-                  color={ThemeDark.background}
+                  color={theme.background}
                 />
               </View>
             </Pressable>
@@ -93,22 +107,26 @@ export default function Navbar({ state, navigation }: BottomTabBarProps) {
             key={route.key}
             onPress={onPress}
             style={styles.tab}
-            android_ripple={{ color: ThemeDark.primaryGlow, borderless: true }}
+            android_ripple={{ color: theme.primaryGlow, borderless: true }}
           >
             <Ionicons
               name={isFocused ? item.iconFocused : item.icon}
               size={22}
-              color={isFocused ? ThemeDark.primary : ThemeDark.textMuted}
+              color={isFocused ? theme.primary : theme.textMuted}
             />
             <Text
               style={[
                 styles.label,
-                { color: isFocused ? ThemeDark.primary : ThemeDark.textDim },
+                { color: isFocused ? theme.primary : theme.textDim },
               ]}
             >
               {item.label}
             </Text>
-            {isFocused && <View style={styles.activeDot} />}
+            {isFocused && (
+              <View
+                style={[styles.activeDot, { backgroundColor: theme.primary }]}
+              />
+            )}
           </Pressable>
         );
       })}
@@ -119,9 +137,7 @@ export default function Navbar({ state, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: ThemeDark.surface,
     borderTopWidth: 1,
-    borderTopColor: ThemeDark.border,
     paddingTop: 10,
     ...Platform.select({
       ios: {
@@ -152,7 +168,6 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: Radius.full,
-    backgroundColor: ThemeDark.primary,
   },
   scanWrapper: {
     flex: 1,
@@ -164,17 +179,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: Radius.full,
-    backgroundColor: ThemeDark.primary,
     alignItems: "center",
     justifyContent: "center",
     marginTop: -20,
-    shadowColor: ThemeDark.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.45,
     shadowRadius: 12,
     elevation: 8,
-  },
-  scanButtonActive: {
-    backgroundColor: ThemeDark.primaryDim,
   },
 });

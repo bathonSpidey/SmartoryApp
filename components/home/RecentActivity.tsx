@@ -1,10 +1,5 @@
-import {
-  Colors,
-  Radius,
-  Spacing,
-  ThemeDark,
-  Typography,
-} from "@/constants/Themes";
+import { Colors, Radius, Spacing, Typography } from "@/constants/Themes";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -19,44 +14,53 @@ type ActivityItem = {
   iconBg: string;
 };
 
-const PLACEHOLDER_ITEMS: ActivityItem[] = [
-  {
-    id: "1",
-    title: "Inventory Updated",
-    subtitle: "Connect your data source to see activity",
-    time: "—",
-    icon: "cube-outline",
-    iconColor: ThemeDark.primary,
-    iconBg: ThemeDark.primaryGlow,
-  },
-  {
-    id: "2",
-    title: "Low Stock Alert",
-    subtitle: "Alerts will appear here once connected",
-    time: "—",
-    icon: "warning-outline",
-    iconColor: Colors.warning,
-    iconBg: Colors.warningLight + "22",
-  },
-  {
-    id: "3",
-    title: "New Category Added",
-    subtitle: "Category changes will show here",
-    time: "—",
-    icon: "folder-outline",
-    iconColor: Colors.info,
-    iconBg: Colors.infoLight + "22",
-  },
-];
-
 export default function RecentActivity() {
+  const theme = useTheme();
+
+  const PLACEHOLDER_ITEMS: ActivityItem[] = [
+    {
+      id: "1",
+      title: "Inventory Updated",
+      subtitle: "Connect your data source to see activity",
+      time: "—",
+      icon: "cube-outline",
+      iconColor: theme.primary,
+      iconBg: theme.primaryGlow,
+    },
+    {
+      id: "2",
+      title: "Low Stock Alert",
+      subtitle: "Alerts will appear here once connected",
+      time: "—",
+      icon: "warning-outline",
+      iconColor: Colors.warning,
+      iconBg: Colors.warningLight + "22",
+    },
+    {
+      id: "3",
+      title: "New Category Added",
+      subtitle: "Category changes will show here",
+      time: "—",
+      icon: "folder-outline",
+      iconColor: Colors.info,
+      iconBg: Colors.infoLight + "22",
+    },
+  ];
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerRow}>
-        <Text style={styles.sectionLabel}>Recent Activity</Text>
-        <Text style={styles.seeAll}>See all</Text>
+        <Text style={[styles.sectionLabel, { color: theme.textMuted }]}>
+          Recent Activity
+        </Text>
+        <Text style={[styles.seeAll, { color: theme.primary }]}>See all</Text>
       </View>
-      <View style={styles.list}>
+      <View
+        style={[
+          styles.list,
+          { backgroundColor: theme.surface, borderColor: theme.border },
+        ]}
+      >
         {PLACEHOLDER_ITEMS.map((item, index) => (
           <ActivityRow
             key={item.id}
@@ -76,20 +80,29 @@ function ActivityRow({
   item: ActivityItem;
   isLast: boolean;
 }) {
+  const theme = useTheme();
   return (
-    <View style={[styles.row, !isLast && styles.rowBorder]}>
+    <View
+      style={[
+        styles.row,
+        !isLast && { borderBottomWidth: 1, borderBottomColor: theme.border },
+      ]}
+    >
       <View style={[styles.iconWrap, { backgroundColor: item.iconBg }]}>
         <Ionicons name={item.icon} size={18} color={item.iconColor} />
       </View>
       <View style={styles.textGroup}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
           {item.title}
         </Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
+        <Text
+          style={[styles.subtitle, { color: theme.textMuted }]}
+          numberOfLines={1}
+        >
           {item.subtitle}
         </Text>
       </View>
-      <Text style={styles.time}>{item.time}</Text>
+      <Text style={[styles.time, { color: theme.textDim }]}>{item.time}</Text>
     </View>
   );
 }
@@ -109,32 +122,17 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: Typography.size.xs,
     fontWeight: "600",
-    color: ThemeDark.textMuted,
     letterSpacing: 1.2,
     textTransform: "uppercase",
   },
-  seeAll: {
-    fontSize: Typography.size.sm,
-    fontWeight: "600",
-    color: ThemeDark.primary,
-  },
-  list: {
-    backgroundColor: ThemeDark.surface,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: ThemeDark.border,
-    overflow: "hidden",
-  },
+  seeAll: { fontSize: Typography.size.sm, fontWeight: "600" },
+  list: { borderRadius: Radius.lg, borderWidth: 1, overflow: "hidden" },
   row: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: Spacing.md,
     paddingVertical: 14,
     gap: Spacing.sm,
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: ThemeDark.border,
   },
   iconWrap: {
     width: 36,
@@ -143,22 +141,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  textGroup: {
-    flex: 1,
-    gap: 2,
-  },
-  title: {
-    fontSize: Typography.size.sm,
-    fontWeight: "600",
-    color: ThemeDark.text,
-  },
-  subtitle: {
-    fontSize: Typography.size.xs,
-    color: ThemeDark.textMuted,
-  },
-  time: {
-    fontSize: 11,
-    color: ThemeDark.textDim,
-    fontWeight: "500",
-  },
+  textGroup: { flex: 1, gap: 2 },
+  title: { fontSize: Typography.size.sm, fontWeight: "600" },
+  subtitle: { fontSize: Typography.size.xs },
+  time: { fontSize: 11, fontWeight: "500" },
 });

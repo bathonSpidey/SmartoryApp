@@ -1,10 +1,5 @@
-import {
-  Colors,
-  Radius,
-  Spacing,
-  ThemeDark,
-  Typography,
-} from "@/constants/Themes";
+import { Colors, Radius, Spacing, Typography } from "@/constants/Themes";
+import { useThemeContext, type ThemeMode } from "@/contexts/ThemeContext";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,9 +16,20 @@ type MenuItem = {
   onPress: () => void;
 };
 
+const THEME_OPTIONS: {
+  mode: ThemeMode;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { mode: "light", label: "Light", icon: "sunny-outline" },
+  { mode: "system", label: "System", icon: "phone-portrait-outline" },
+  { mode: "dark", label: "Dark", icon: "moon-outline" },
+];
+
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { session } = useSession();
+  const { theme, mode: themeMode, setMode: setThemeMode } = useThemeContext();
   const userEmail = session?.user?.email ?? "";
   const initial = userEmail ? userEmail.charAt(0).toUpperCase() : "?";
 
@@ -53,53 +59,146 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Profile</Text>
+    <View
+      style={[
+        styles.screen,
+        { paddingTop: insets.top, backgroundColor: theme.background },
+      ]}
+    >
+      <View
+        style={[
+          styles.header,
+          { borderBottomColor: theme.border, backgroundColor: theme.surface },
+        ]}
+      >
+        <Text style={[styles.title, { color: theme.text }]}>Profile</Text>
       </View>
 
       {/* Avatar section */}
       <View style={styles.avatarSection}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarInitial}>{initial}</Text>
+        <View
+          style={[
+            styles.avatar,
+            { backgroundColor: theme.primaryDeep, borderColor: theme.primary },
+          ]}
+        >
+          <Text style={[styles.avatarInitial, { color: theme.primary }]}>
+            {initial}
+          </Text>
         </View>
-        <Text style={styles.name}>{userEmail || "Your Account"}</Text>
+        <Text style={[styles.name, { color: theme.text }]}>
+          {userEmail || "Your Account"}
+        </Text>
+      </View>
+
+      {/* Theme picker */}
+      <View
+        style={[
+          styles.themeCard,
+          { backgroundColor: theme.surface, borderColor: theme.border },
+        ]}
+      >
+        <View style={styles.themeHeader}>
+          <Ionicons
+            name="color-palette-outline"
+            size={16}
+            color={theme.textMuted}
+          />
+          <Text style={[styles.themeLabel, { color: theme.textMuted }]}>
+            APPEARANCE
+          </Text>
+        </View>
+        <View
+          style={[styles.themeTrack, { backgroundColor: theme.surfaceSubtle }]}
+        >
+          {THEME_OPTIONS.map((opt) => {
+            const active = themeMode === opt.mode;
+            return (
+              <Pressable
+                key={opt.mode}
+                onPress={() => setThemeMode(opt.mode)}
+                style={[
+                  styles.themeOption,
+                  active && {
+                    backgroundColor: theme.surface,
+                    ...theme.shadowCard,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={opt.icon}
+                  size={16}
+                  color={active ? theme.primary : theme.textDim}
+                />
+                <Text
+                  style={[
+                    styles.themeOptionLabel,
+                    { color: active ? theme.primary : theme.textDim },
+                    active && { fontWeight: "700" },
+                  ]}
+                >
+                  {opt.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       {/* Menu */}
-      <View style={styles.menuCard}>
+      <View
+        style={[
+          styles.menuCard,
+          { backgroundColor: theme.surface, borderColor: theme.border },
+        ]}
+      >
         {MENU_ITEMS.map((item, index) => (
           <Pressable
             key={item.id}
             onPress={item.onPress}
             style={({ pressed }) => [
               styles.menuRow,
-              index < MENU_ITEMS.length - 1 && styles.menuRowBorder,
-              pressed && styles.menuRowPressed,
+              index < MENU_ITEMS.length - 1 && {
+                borderBottomWidth: 1,
+                borderBottomColor: theme.border,
+              },
+              pressed && { backgroundColor: theme.surfaceHover },
             ]}
           >
             <View
-              style={[styles.menuIcon, item.danger && styles.menuIconDanger]}
+              style={[
+                styles.menuIcon,
+                { backgroundColor: theme.background },
+                item.danger && { backgroundColor: Colors.error + "18" },
+              ]}
             >
               <Ionicons
                 name={item.icon}
                 size={20}
-                color={item.danger ? Colors.error : ThemeDark.textMuted}
+                color={item.danger ? Colors.error : theme.textMuted}
               />
             </View>
             <View style={styles.menuText}>
-              <Text style={[styles.menuLabel, item.danger && styles.danger]}>
+              <Text
+                style={[
+                  styles.menuLabel,
+                  { color: theme.text },
+                  item.danger && { color: Colors.error },
+                ]}
+              >
                 {item.label}
               </Text>
               {item.sublabel && (
-                <Text style={styles.menuSublabel}>{item.sublabel}</Text>
+                <Text style={[styles.menuSublabel, { color: theme.textMuted }]}>
+                  {item.sublabel}
+                </Text>
               )}
             </View>
             {!item.danger && (
               <Ionicons
                 name="chevron-forward"
                 size={16}
-                color={ThemeDark.textDim}
+                color={theme.textDim}
               />
             )}
           </Pressable>
@@ -111,7 +210,8 @@ export default function ProfileScreen() {
         onPress={() => setConfirmVisible(true)}
         style={({ pressed }) => [
           styles.signOutButton,
-          pressed && styles.signOutButtonPressed,
+          { backgroundColor: theme.surface, borderColor: Colors.error + "55" },
+          pressed && { opacity: 0.7 },
         ]}
       >
         <View style={styles.signOutIcon}>
@@ -128,12 +228,19 @@ export default function ProfileScreen() {
         onRequestClose={() => setConfirmVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
+          <View
+            style={[
+              styles.modalCard,
+              { backgroundColor: theme.surface, borderColor: theme.border },
+            ]}
+          >
             <View style={styles.modalIconWrap}>
               <Ionicons name="log-out-outline" size={28} color={Colors.error} />
             </View>
-            <Text style={styles.modalTitle}>Sign Out</Text>
-            <Text style={styles.modalMessage}>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>
+              Sign Out
+            </Text>
+            <Text style={[styles.modalMessage, { color: theme.textMuted }]}>
               Are you sure you want to sign out of your account?
             </Text>
             <View style={styles.modalActions}>
@@ -141,11 +248,19 @@ export default function ProfileScreen() {
                 onPress={() => setConfirmVisible(false)}
                 style={({ pressed }) => [
                   styles.modalBtn,
-                  styles.modalBtnCancel,
+                  {
+                    backgroundColor: theme.background,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                  },
                   pressed && { opacity: 0.7 },
                 ]}
               >
-                <Text style={styles.modalBtnCancelText}>Cancel</Text>
+                <Text
+                  style={[styles.modalBtnCancelText, { color: theme.text }]}
+                >
+                  Cancel
+                </Text>
               </Pressable>
               <Pressable
                 onPress={handleSignOut}
@@ -166,18 +281,15 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: ThemeDark.background },
+  screen: { flex: 1 },
   header: {
     paddingHorizontal: Spacing.screenPadding,
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: ThemeDark.border,
-    backgroundColor: ThemeDark.surface,
   },
   title: {
     fontSize: Typography.size.xl,
     fontWeight: "700",
-    color: ThemeDark.text,
   },
   avatarSection: {
     alignItems: "center",
@@ -188,9 +300,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: Radius.full,
-    backgroundColor: ThemeDark.primaryDeep,
     borderWidth: 2,
-    borderColor: ThemeDark.primary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.sm,
@@ -198,19 +308,54 @@ const styles = StyleSheet.create({
   name: {
     fontSize: Typography.size.lg,
     fontWeight: "700",
-    color: ThemeDark.text,
   },
   avatarInitial: {
     fontSize: 36,
     fontWeight: "700",
-    color: ThemeDark.primary,
   },
-  menuCard: {
+  // ── Theme picker ────────────────────────────
+  themeCard: {
     marginHorizontal: Spacing.screenPadding,
-    backgroundColor: ThemeDark.surface,
+    marginBottom: Spacing.md,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: ThemeDark.border,
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  themeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  themeLabel: {
+    fontSize: Typography.size.xs,
+    fontWeight: "600",
+    letterSpacing: 1.2,
+  },
+  themeTrack: {
+    flexDirection: "row",
+    borderRadius: Radius.md,
+    padding: 4,
+    gap: 4,
+  },
+  themeOption: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    paddingVertical: 9,
+    borderRadius: Radius.sm,
+  },
+  themeOptionLabel: {
+    fontSize: Typography.size.xs,
+    fontWeight: "500",
+  },
+  // ── Menu ────────────────────────────────────
+  menuCard: {
+    marginHorizontal: Spacing.screenPadding,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
     overflow: "hidden",
   },
   menuRow: {
@@ -220,44 +365,35 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     gap: Spacing.sm,
   },
-  menuRowBorder: { borderBottomWidth: 1, borderBottomColor: ThemeDark.border },
-  menuRowPressed: { backgroundColor: ThemeDark.surfaceHover },
   menuIcon: {
     width: 36,
     height: 36,
     borderRadius: Radius.sm,
-    backgroundColor: ThemeDark.background,
     alignItems: "center",
     justifyContent: "center",
   },
-  menuIconDanger: { backgroundColor: Colors.errorLight + "22" },
   menuText: { flex: 1, gap: 2 },
   menuLabel: {
     fontSize: Typography.size.sm,
     fontWeight: "600",
-    color: ThemeDark.text,
   },
-  menuSublabel: { fontSize: Typography.size.xs, color: ThemeDark.textMuted },
-  danger: { color: Colors.error },
+  menuSublabel: { fontSize: Typography.size.xs },
   signOutButton: {
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: Spacing.screenPadding,
     marginTop: Spacing.md,
-    backgroundColor: ThemeDark.surface,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: Colors.error + "55",
     paddingHorizontal: Spacing.md,
     paddingVertical: 14,
     gap: Spacing.sm,
   },
-  signOutButtonPressed: { opacity: 0.7 },
   signOutIcon: {
     width: 36,
     height: 36,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.errorLight + "22",
+    backgroundColor: Colors.error + "18",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -275,10 +411,8 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     width: "100%",
-    backgroundColor: ThemeDark.surface,
     borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: ThemeDark.border,
     padding: Spacing.lg,
     alignItems: "center",
     gap: Spacing.sm,
@@ -287,7 +421,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: Radius.full,
-    backgroundColor: Colors.errorLight + "22",
+    backgroundColor: Colors.error + "18",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.xs,
@@ -295,11 +429,9 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: Typography.size.lg,
     fontWeight: "700",
-    color: ThemeDark.text,
   },
   modalMessage: {
     fontSize: Typography.size.sm,
-    color: ThemeDark.textMuted,
     textAlign: "center",
     lineHeight: 20,
   },
@@ -315,15 +447,9 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     alignItems: "center",
   },
-  modalBtnCancel: {
-    backgroundColor: ThemeDark.background,
-    borderWidth: 1,
-    borderColor: ThemeDark.border,
-  },
   modalBtnCancelText: {
     fontSize: Typography.size.sm,
     fontWeight: "600",
-    color: ThemeDark.text,
   },
   modalBtnConfirm: {
     backgroundColor: Colors.error,

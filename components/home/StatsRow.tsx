@@ -3,9 +3,9 @@ import {
   Radius,
   Shadow,
   Spacing,
-  ThemeDark,
   Typography,
 } from "@/constants/Themes";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -14,8 +14,8 @@ type Stat = {
   label: string;
   value: string;
   icon: keyof typeof Ionicons.glyphMap;
-  iconColor: string;
-  iconBg: string;
+  iconColorKey: "primary" | "warning" | "info";
+  iconBgKey: "primaryGlow" | "warningBg" | "infoBg";
   trend?: string;
   trendUp?: boolean;
 };
@@ -25,29 +25,32 @@ const STATS: Stat[] = [
     label: "Total Items",
     value: "—",
     icon: "cube-outline",
-    iconColor: ThemeDark.primary,
-    iconBg: ThemeDark.primaryGlow,
+    iconColorKey: "primary",
+    iconBgKey: "primaryGlow",
   },
   {
     label: "Low Stock",
     value: "—",
     icon: "warning-outline",
-    iconColor: Colors.warning,
-    iconBg: Colors.warningLight + "22",
+    iconColorKey: "warning",
+    iconBgKey: "warningBg",
   },
   {
     label: "Categories",
     value: "—",
     icon: "grid-outline",
-    iconColor: Colors.info,
-    iconBg: Colors.infoLight + "22",
+    iconColorKey: "info",
+    iconBgKey: "infoBg",
   },
 ];
 
 export default function StatsRow() {
+  const theme = useTheme();
   return (
     <View style={styles.wrapper}>
-      <Text style={styles.sectionLabel}>Overview</Text>
+      <Text style={[styles.sectionLabel, { color: theme.textMuted }]}>
+        Overview
+      </Text>
       <View style={styles.row}>
         {STATS.map((stat) => (
           <StatCard key={stat.label} stat={stat} />
@@ -58,13 +61,23 @@ export default function StatsRow() {
 }
 
 function StatCard({ stat }: { stat: Stat }) {
+  const theme = useTheme();
+  const iconColor = theme[stat.iconColorKey];
+  const iconBg = theme[stat.iconBgKey];
   return (
-    <View style={styles.card}>
-      <View style={[styles.iconWrap, { backgroundColor: stat.iconBg }]}>
-        <Ionicons name={stat.icon} size={18} color={stat.iconColor} />
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: theme.surface, borderColor: theme.border },
+      ]}
+    >
+      <View style={[styles.iconWrap, { backgroundColor: iconBg }]}>
+        <Ionicons name={stat.icon} size={18} color={iconColor} />
       </View>
-      <Text style={styles.value}>{stat.value}</Text>
-      <Text style={styles.label}>{stat.label}</Text>
+      <Text style={[styles.value, { color: theme.text }]}>{stat.value}</Text>
+      <Text style={[styles.label, { color: theme.textMuted }]}>
+        {stat.label}
+      </Text>
       {stat.trend && (
         <View style={styles.trendRow}>
           <Ionicons
@@ -87,29 +100,20 @@ function StatCard({ stat }: { stat: Stat }) {
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    paddingHorizontal: Spacing.screenPadding,
-    paddingTop: Spacing.lg,
-  },
+  wrapper: { paddingHorizontal: Spacing.screenPadding, paddingTop: Spacing.lg },
   sectionLabel: {
     fontSize: Typography.size.xs,
     fontWeight: "600",
-    color: ThemeDark.textMuted,
     letterSpacing: 1.2,
     textTransform: "uppercase",
     marginBottom: Spacing.sm,
   },
-  row: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-  },
+  row: { flexDirection: "row", gap: Spacing.sm },
   card: {
     flex: 1,
-    backgroundColor: ThemeDark.surface,
     borderRadius: Radius.lg,
     padding: Spacing.sm + 4,
     borderWidth: 1,
-    borderColor: ThemeDark.border,
     gap: 2,
     ...Shadow.xs,
   },
@@ -124,23 +128,14 @@ const styles = StyleSheet.create({
   value: {
     fontSize: Typography.size.xl,
     fontWeight: "700",
-    color: ThemeDark.text,
     letterSpacing: -0.5,
   },
-  label: {
-    fontSize: 10,
-    fontWeight: "500",
-    color: ThemeDark.textMuted,
-    letterSpacing: 0.2,
-  },
+  label: { fontSize: 10, fontWeight: "500", letterSpacing: 0.2 },
   trendRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 2,
     marginTop: 2,
   },
-  trend: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
+  trend: { fontSize: 10, fontWeight: "600" },
 });

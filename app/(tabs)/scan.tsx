@@ -1,4 +1,5 @@
-import { Radius, Spacing, ThemeDark, Typography } from "@/constants/Themes";
+import { Radius, Spacing, Typography } from "@/constants/Themes";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -6,46 +7,73 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ScanScreen() {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Scan</Text>
+    <View
+      style={[
+        styles.screen,
+        { paddingTop: insets.top, backgroundColor: theme.background },
+      ]}
+    >
+      <View
+        style={[
+          styles.header,
+          { borderBottomColor: theme.border, backgroundColor: theme.surface },
+        ]}
+      >
+        <Text style={[styles.title, { color: theme.text }]}>Scan</Text>
       </View>
       <View style={styles.body}>
         <View style={styles.scanArea}>
-          {/* Corner brackets */}
-          <View style={[styles.corner, styles.topLeft]} />
-          <View style={[styles.corner, styles.topRight]} />
-          <View style={[styles.corner, styles.bottomLeft]} />
-          <View style={[styles.corner, styles.bottomRight]} />
-          <Ionicons name="scan-outline" size={56} color={ThemeDark.textDim} />
+          <View
+            style={[
+              styles.corner,
+              styles.topLeft,
+              { borderColor: theme.primary },
+            ]}
+          />
+          <View
+            style={[
+              styles.corner,
+              styles.topRight,
+              { borderColor: theme.primary },
+            ]}
+          />
+          <View
+            style={[
+              styles.corner,
+              styles.bottomLeft,
+              { borderColor: theme.primary },
+            ]}
+          />
+          <View
+            style={[
+              styles.corner,
+              styles.bottomRight,
+              { borderColor: theme.primary },
+            ]}
+          />
+          <Ionicons name="scan-outline" size={56} color={theme.textDim} />
         </View>
-        <Text style={styles.hint}>
+        <Text style={[styles.hint, { color: theme.text }]}>
           Point your camera at a barcode or QR code
         </Text>
-        <Text style={styles.subHint}>Barcode scanner coming soon</Text>
+        <Text style={[styles.subHint, { color: theme.textMuted }]}>
+          Barcode scanner coming soon
+        </Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: ThemeDark.background,
-  },
+  screen: { flex: 1 },
   header: {
     paddingHorizontal: Spacing.screenPadding,
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: ThemeDark.border,
-    backgroundColor: ThemeDark.surface,
   },
-  title: {
-    fontSize: Typography.size.xl,
-    fontWeight: "700",
-    color: ThemeDark.text,
-  },
+  title: { fontSize: Typography.size.xl, fontWeight: "700" },
   body: {
     flex: 1,
     alignItems: "center",
@@ -64,7 +92,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 28,
     height: 28,
-    borderColor: ThemeDark.primary,
     borderWidth: 3,
   },
   topLeft: {
@@ -98,11 +125,7 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: Typography.size.sm,
     fontWeight: "600",
-    color: ThemeDark.text,
     textAlign: "center",
   },
-  subHint: {
-    fontSize: Typography.size.xs,
-    color: ThemeDark.textMuted,
-  },
+  subHint: { fontSize: Typography.size.xs },
 });

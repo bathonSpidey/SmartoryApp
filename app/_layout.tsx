@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/lib/supabase";
 import * as Linking from "expo-linking";
@@ -97,12 +98,14 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <AuthGuard />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <AuthGuard />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+        </Stack>
+      </SafeAreaProvider>
+    </ThemeProvider>
   );
 }

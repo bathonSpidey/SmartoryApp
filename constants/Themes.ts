@@ -1,64 +1,261 @@
 // ─────────────────────────────────────────────
-//  Smartory — Design System
-//  Aesthetic: Industrial-Minimal / Professional
+//  Smartory — Design System v2
+//  Aesthetic: Warm-Professional / Smart Home
+//  Serves both B2B operators and everyday users
+//  (think: kitchen pantry meets smart assistant)
+// ─────────────────────────────────────────────
+
+// ─────────────────────────────────────────────
+//  Semantic Theme Type
+//  Both ThemeLight and ThemeDark satisfy this.
+//  Use the `useTheme()` hook — never import
+//  ThemeLight / ThemeDark directly in screens.
+// ─────────────────────────────────────────────
+
+export type SemanticTheme = {
+  // ── Surfaces ─────────────────────────────
+  background: string;
+  surface: string;
+  surfaceElevated: string;
+  surfaceInput: string;
+  surfaceHover: string;
+  surfaceSubtle: string;
+
+  // ── Borders ──────────────────────────────
+  border: string;
+  borderFocus: string;
+  borderStrong: string;
+
+  // ── Brand / Primary ───────────────────────
+  primary: string;
+  primaryDim: string;
+  primaryDeep: string;
+  primaryGlow: string;
+  primaryText: string;
+
+  // ── Text ─────────────────────────────────
+  text: string;
+  textMuted: string;
+  textDim: string;
+  textInverse: string;
+
+  // ── Semantic ─────────────────────────────
+  success: string;
+  successBg: string;
+  warning: string;
+  warningBg: string;
+  error: string;
+  errorBg: string;
+  info: string;
+  infoBg: string;
+
+  // ── Shadows ──────────────────────────────
+  shadowCard: {
+    shadowColor: string;
+    shadowOffset: { width: number; height: number };
+    shadowOpacity: number;
+    shadowRadius: number;
+    elevation: number;
+  };
+  shadowPrimary: {
+    shadowColor: string;
+    shadowOffset: { width: number; height: number };
+    shadowOpacity: number;
+    shadowRadius: number;
+    elevation: number;
+  };
+};
+
+// ─────────────────────────────────────────────
+//  Light Theme  — "Warm Pantry"
+//  Cream whites + warm stone neutrals.
+//  Feels like a tidy kitchen notepad, not a
+//  cold enterprise dashboard.
+// ─────────────────────────────────────────────
+
+export const ThemeLight: SemanticTheme = {
+  // ── Surfaces ─────────────────────────────
+  background: "#faf8f5", // warm cream — linen / paper
+  surface: "#ffffff",
+  surfaceElevated: "#f5f2ec",
+  surfaceInput: "#f2efe9",
+  surfaceHover: "#ede9e2",
+  surfaceSubtle: "#f7f4ef",
+
+  // ── Borders ──────────────────────────────
+  border: "#e5dfd5", // warm beige divider
+  borderFocus: "#0d9488",
+  borderStrong: "#cec8be",
+
+  // ── Brand ────────────────────────────────
+  primary: "#0d9488",
+  primaryDim: "#0f766e",
+  primaryDeep: "#e6faf8", // light teal tint for avatar bg, chips
+  primaryGlow: "#0d948814",
+  primaryText: "#0d9488",
+
+  // ── Text ─────────────────────────────────
+  text: "#1c1410", // warm near-black (stone, not cold slate)
+  textMuted: "#7c7168", // warm mid-brown
+  textDim: "#a89f97", // warm light — placeholder, disabled
+  textInverse: "#ffffff",
+
+  // ── Semantic ─────────────────────────────
+  success: "#059669",
+  successBg: "#ecfdf5",
+  warning: "#d97706",
+  warningBg: "#fffbeb",
+  error: "#dc2626",
+  errorBg: "#fef2f2",
+  info: "#2563eb",
+  infoBg: "#eff6ff",
+
+  // ── Shadows ──────────────────────────────
+  shadowCard: {
+    shadowColor: "#7c6f5a",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  shadowPrimary: {
+    shadowColor: "#0d9488",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+};
+
+// ─────────────────────────────────────────────
+//  Dark Theme  — "Deep Forest Kitchen"
+//  Warm deep teal-greens — not cold blue-black.
+//  Feels like a premium smart-home UI at night.
+// ─────────────────────────────────────────────
+
+export const ThemeDark: SemanticTheme = {
+  // ── Surfaces ─────────────────────────────
+  background: "#0c1a16",
+  surface: "#112620",
+  surfaceElevated: "#162e27",
+  surfaceInput: "#0e221d",
+  surfaceHover: "#1a3229",
+  surfaceSubtle: "#0e1f1b",
+
+  // ── Borders ──────────────────────────────
+  border: "#1e3f38",
+  borderFocus: "#14b8a6",
+  borderStrong: "#2a5248",
+
+  // ── Brand ────────────────────────────────
+  primary: "#14b8a6",
+  primaryDim: "#0d9488",
+  primaryDeep: "#073d37",
+  primaryGlow: "#14b8a614",
+  primaryText: "#14b8a6",
+
+  // ── Text ─────────────────────────────────
+  text: "#e8f5f2",
+  textMuted: "#6fa89e",
+  textDim: "#3d7269",
+  textInverse: "#0c1a16",
+
+  // ── Semantic ─────────────────────────────
+  success: "#10b981",
+  successBg: "#10b98118",
+  warning: "#f59e0b",
+  warningBg: "#f59e0b18",
+  error: "#ef4444",
+  errorBg: "#ef444418",
+  info: "#3b82f6",
+  infoBg: "#3b82f618",
+
+  // ── Shadows ──────────────────────────────
+  shadowCard: {
+    shadowColor: "#14b8a6",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 32,
+    elevation: 8,
+  },
+  shadowPrimary: {
+    shadowColor: "#14b8a6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+};
+
+// ─────────────────────────────────────────────
+//  Global Brand Palette  (theme-independent)
 // ─────────────────────────────────────────────
 
 export const Colors = {
-  // ── Brand ──────────────────────────────────
-  primary: "#0d9488", // Teal-600: precise, efficient, trustworthy
-  primaryLight: "#14b8a6", // Teal-500: hover / active states
-  primaryMuted: "#ccfbf1", // Teal-100: backgrounds, tags, badges
-  primaryDark: "#0f766e", // Teal-700: pressed states, deep emphasis
+  // ── Brand ────────────────────────────────────
+  primary: "#0d9488",
+  primaryLight: "#14b8a6",
+  primaryMuted: "#ccfbf1",
+  primaryDark: "#0f766e",
 
-  // ── Accent ─────────────────────────────────
-  accent: "#f59e0b", // Amber-400: low-stock warnings, highlights
-  accentLight: "#fef3c7", // Amber-100: warning backgrounds
-  accentDark: "#d97706", // Amber-600: warning icons / text
+  // ── Accent  (amber = warmth, receipts) ──────
+  accent: "#f59e0b",
+  accentLight: "#fef3c7",
+  accentDark: "#d97706",
+  accentDeep: "#92400e",
 
-  // ── Neutrals ───────────────────────────────
-  ink: "#0c1a1a", // Near-black, slightly warm
-  slate900: "#134e4a", // Deep teal-slate (nav bar, headings)
-  slate700: "#374151", // Body text
-  slate500: "#6b7280", // Muted / secondary text
-  slate300: "#d1d5db", // Borders, dividers
-  slate100: "#f3f4f6", // Surface tint
-  slate50: "#f9fafb", // Page background
+  // ── Warm Neutrals (stone, not cold slate) ───
+  ink: "#1c1410",
+  stone900: "#1c1410",
+  stone700: "#44403c",
+  stone500: "#78716c",
+  stone300: "#d6d3d1",
+  stone100: "#f5f5f4",
+  stone50: "#faf9f7",
 
-  // ── Semantic ───────────────────────────────
-  success: "#10b981", // Emerald-500: in-stock, confirmed
-  successLight: "#d1fae5", // Emerald-100
-  warning: "#f59e0b", // Amber-400: low-stock
-  warningLight: "#fef3c7", // Amber-100
-  error: "#ef4444", // Red-500: out-of-stock, errors
-  errorLight: "#fee2e2", // Red-100
-  info: "#3b82f6", // Blue-500: informational
-  infoLight: "#dbeafe", // Blue-100
+  // ── Legacy aliases (keep backward compat) ───
+  slate900: "#134e4a",
+  slate700: "#374151",
+  slate500: "#6b7280",
+  slate300: "#d1d5db",
+  slate100: "#f3f4f6",
+  slate50: "#f9fafb",
 
-  // ── Base ───────────────────────────────────
+  // ── Semantic ─────────────────────────────────
+  success: "#059669",
+  successLight: "#ecfdf5",
+  warning: "#d97706",
+  warningLight: "#fffbeb",
+  error: "#dc2626",
+  errorLight: "#fef2f2",
+  info: "#2563eb",
+  infoLight: "#eff6ff",
+
+  // ── Base ─────────────────────────────────────
   white: "#ffffff",
   black: "#000000",
   transparent: "transparent",
 
-  // ── Aliases (keep existing references working) ──
-  background: "#f9fafb",
+  // ── Aliases ──────────────────────────────────
+  background: "#faf8f5",
   surface: "#ffffff",
-  surfaceElevated: "#f3f4f6",
-  text: "#0c1a1a",
-  textMuted: "#6b7280",
+  surfaceElevated: "#f5f2ec",
+  text: "#1c1410",
+  textMuted: "#7c7168",
   textInverse: "#ffffff",
-  border: "#e5e7eb",
-  borderStrong: "#d1d5db",
-  secondary: "#6b7280",
+  border: "#e5dfd5",
+  borderStrong: "#cec8be",
+  secondary: "#78716c",
 };
 
 // ─────────────────────────────────────────────
 //  Typography
+//  DM Sans = approachable & human (great for
+//  everyday users). Space Grotesk = pro edge.
 // ─────────────────────────────────────────────
 
 export const Typography = {
   fontFamily: {
-    // Pair: "DM Sans" (body) + "Space Grotesk" (display)
-    // Install: expo install @expo-google-fonts/dm-sans @expo-google-fonts/space-grotesk
     display: "SpaceGrotesk_600SemiBold",
     displayBold: "SpaceGrotesk_700Bold",
     body: "DMSans_400Regular",
@@ -116,16 +313,18 @@ export const Spacing = {
 
 // ─────────────────────────────────────────────
 //  Border Radius
+//  Slightly rounder than v1 — more approachable
+//  and friendly for non-B2B users.
 // ─────────────────────────────────────────────
 
 export const Radius = {
   none: 0,
   xs: 4,
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 20,
-  "2xl": 28,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 22,
+  "2xl": 32,
   full: 9999,
 };
 
@@ -133,50 +332,53 @@ export const Radius = {
 //  Shadows
 // ─────────────────────────────────────────────
 
+// ─────────────────────────────────────────────
+//  Shadows  (warm brown base — not cold gray)
+//  Use theme.shadowCard / theme.shadowPrimary
+//  for theme-aware shadows in screens.
+// ─────────────────────────────────────────────
+
 export const Shadow = {
-  // Legacy alias
+  none: {},
   soft: {
-    shadowColor: Colors.ink,
+    shadowColor: "#7c6f5a",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 10,
     elevation: 2,
   },
-  // Expanded set
-  none: {},
   xs: {
-    shadowColor: Colors.ink,
+    shadowColor: "#7c6f5a",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 4,
     elevation: 1,
   },
   sm: {
-    shadowColor: Colors.ink,
+    shadowColor: "#7c6f5a",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
   md: {
-    shadowColor: Colors.ink,
+    shadowColor: "#7c6f5a",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
     elevation: 4,
   },
   lg: {
-    shadowColor: Colors.ink,
+    shadowColor: "#7c6f5a",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.1,
     shadowRadius: 24,
     elevation: 8,
   },
-  // Tinted shadow for primary cards
   primary: {
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.22,
     shadowRadius: 16,
     elevation: 5,
   },
@@ -294,7 +496,7 @@ export const ComponentTokens = {
       width: 44,
       height: 44,
       borderRadius: Radius.md,
-      backgroundColor: Colors.slate100,
+      backgroundColor: Colors.stone100,
     },
   },
   navbar: {
@@ -337,61 +539,7 @@ export const StockStatus = {
   },
   discontinued: {
     label: "Discontinued",
-    color: Colors.slate500,
-    background: Colors.slate100,
-  },
-};
-
-// ─────────────────────────────────────────────
-//  Dark Theme  (app-wide semantic tokens)
-//  Use these for dark-mode screens so each
-//  screen never hard-codes hex values.
-// ─────────────────────────────────────────────
-
-export const ThemeDark = {
-  // ── Surfaces ─────────────────────────────
-  background: "#050f0e", // page / screen
-  surface: "#0b211f", // card, sheet
-  surfaceInput: "#071c1a", // input field
-  surfaceHover: "#09211f", // focused input / hovered item
-  surfaceSubtle: "#06100f", // pill background, tab track
-
-  // ── Borders ──────────────────────────────
-  border: "#14b8a625", // default border
-  borderFocus: "#14b8a6", // focused border
-  borderStrong: "#14b8a640", // dividers, strong rule
-
-  // ── Brand ────────────────────────────────
-  primary: "#14b8a6", // teal-500
-  primaryDim: "#0d9488", // teal-600
-  primaryDeep: "#065f59", // teal-900 (active tab bg)
-  primaryGlow: "#14b8a614", // glow / pill fill
-
-  // ── Text ─────────────────────────────────
-  text: "#dff0ed", // primary body
-  textMuted: "#6ea8a2", // labels, captions
-  textDim: "#3d706a", // placeholder, disabled
-  textInverse: "#050f0e", // on primary button
-
-  // ── Semantic ─────────────────────────────
-  success: "#10b981",
-  warning: "#f59e0b",
-  error: "#ef4444",
-  info: "#3b82f6",
-
-  // ── Shadow ───────────────────────────────
-  shadowPrimary: {
-    shadowColor: "#14b8a6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-  shadowCard: {
-    shadowColor: "#14b8a6",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.1,
-    shadowRadius: 40,
-    elevation: 8,
+    color: Colors.stone500,
+    background: Colors.stone100,
   },
 };

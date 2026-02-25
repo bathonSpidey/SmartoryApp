@@ -1,10 +1,5 @@
-import {
-  Colors,
-  Radius,
-  Spacing,
-  ThemeDark,
-  Typography,
-} from "@/constants/Themes";
+import { Colors, Radius, Spacing, Typography } from "@/constants/Themes";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -22,6 +17,7 @@ export default function HomeHeader({
 }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const theme = useTheme();
 
   const displayName = userEmail ? userEmail.split("@")[0] : "there";
   const initial = displayName.charAt(0).toUpperCase();
@@ -34,29 +30,46 @@ export default function HomeHeader({
   })();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + 8,
+          backgroundColor: theme.surface,
+          borderBottomColor: theme.border,
+        },
+      ]}
+    >
       {/* Brand row */}
       <View style={styles.brandRow}>
-        <View style={styles.logoMark}>
-          <Ionicons name="layers" size={18} color={ThemeDark.primary} />
+        <View style={[styles.logoMark, { backgroundColor: theme.primaryGlow }]}>
+          <Ionicons name="layers" size={18} color={theme.primary} />
         </View>
-        <Text style={styles.brandName}>Smartory</Text>
+        <Text style={[styles.brandName, { color: theme.primary }]}>
+          Smartory
+        </Text>
       </View>
 
       {/* Greeting + Actions */}
       <View style={styles.bottomRow}>
         <View>
-          <Text style={styles.greeting}>{greeting},</Text>
-          <Text style={styles.userName}>{displayName}</Text>
+          <Text style={[styles.greeting, { color: theme.textMuted }]}>
+            {greeting},
+          </Text>
+          <Text style={[styles.userName, { color: theme.text }]}>
+            {displayName}
+          </Text>
         </View>
 
         <View style={styles.actions}>
           {/* Notifications */}
-          <Pressable style={styles.iconButton}>
+          <Pressable
+            style={[styles.iconButton, { backgroundColor: theme.background }]}
+          >
             <Ionicons
               name="notifications-outline"
               size={22}
-              color={ThemeDark.text}
+              color={theme.text}
             />
             {notificationCount > 0 && (
               <View style={styles.badge}>
@@ -69,10 +82,18 @@ export default function HomeHeader({
 
           {/* Avatar */}
           <Pressable
-            style={styles.avatar}
+            style={[
+              styles.avatar,
+              {
+                backgroundColor: theme.primaryDeep,
+                borderColor: theme.primary,
+              },
+            ]}
             onPress={() => router.push("/(tabs)/profile")}
           >
-            <Text style={styles.avatarText}>{initial}</Text>
+            <Text style={[styles.avatarText, { color: theme.primary }]}>
+              {initial}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -82,11 +103,9 @@ export default function HomeHeader({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: ThemeDark.surface,
     paddingHorizontal: Spacing.screenPadding,
     paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: ThemeDark.border,
   },
   brandRow: {
     flexDirection: "row",
@@ -98,14 +117,12 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: Radius.sm,
-    backgroundColor: ThemeDark.primaryGlow,
     alignItems: "center",
     justifyContent: "center",
   },
   brandName: {
     fontSize: Typography.size.md,
     fontWeight: "700",
-    color: ThemeDark.primary,
     letterSpacing: 0.5,
   },
   bottomRow: {
@@ -113,27 +130,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  greeting: {
-    fontSize: Typography.size.sm,
-    color: ThemeDark.textMuted,
-    letterSpacing: 0.2,
-  },
+  greeting: { fontSize: Typography.size.sm, letterSpacing: 0.2 },
   userName: {
     fontSize: Typography.size.xl,
     fontWeight: "700",
-    color: ThemeDark.text,
     letterSpacing: -0.3,
   },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.sm,
-  },
+  actions: { flexDirection: "row", alignItems: "center", gap: Spacing.sm },
   iconButton: {
     width: 40,
     height: 40,
     borderRadius: Radius.md,
-    backgroundColor: ThemeDark.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -149,24 +156,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 3,
   },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: "700",
-    color: Colors.white,
-  },
+  badgeText: { fontSize: 9, fontWeight: "700", color: Colors.white },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: Radius.full,
-    backgroundColor: ThemeDark.primaryDeep,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: ThemeDark.primary,
   },
-  avatarText: {
-    fontSize: Typography.size.base,
-    fontWeight: "700",
-    color: ThemeDark.primary,
-  },
+  avatarText: { fontSize: Typography.size.base, fontWeight: "700" },
 });
