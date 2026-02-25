@@ -4,10 +4,11 @@
 // ─────────────────────────────────────────────
 
 import BotFace from "@/components/agents/BotFace";
-import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
+import { SemanticTheme } from "@/constants/Themes";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { styles } from "./styles/AgentCard.styles";
 import { AgentConfig, AgentMeta } from "./types";
 
 type Props = {
@@ -77,6 +78,13 @@ export default function AgentCard({
       {/* ── Bot face ── */}
       <View style={styles.faceContainer}>
         <BotFace
+          agentType={
+            agentType as
+              | "extractor"
+              | "recommender"
+              | "planner"
+              | "budget_watcher"
+          }
           accent={meta.accentHex}
           dim={dimColor}
           headBg={headBg}
@@ -186,65 +194,3 @@ function ConfigPill({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    borderRadius: Radius.xl,
-    borderWidth: 1.5,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.md,
-    alignItems: "center",
-    gap: 6,
-    minWidth: 150,
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
-    borderRadius: Radius.full,
-    alignSelf: "flex-end",
-  },
-  badgeDot: { width: 6, height: 6, borderRadius: 3 },
-  badgeText: { fontSize: Typography.size.xs, fontWeight: "600" },
-  faceContainer: { marginVertical: 4 },
-  agentName: {
-    fontSize: Typography.size.sm,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  agentDesc: {
-    fontSize: Typography.size.xs,
-    textAlign: "center",
-    lineHeight: 16,
-  },
-  configRow: {
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 4,
-    padding: Spacing.xs,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    justifyContent: "center",
-    marginTop: 2,
-  },
-  pill: { flexDirection: "row", alignItems: "center", gap: 3 },
-  pillText: { fontSize: 10, fontWeight: "500" },
-  actionBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 7,
-    borderRadius: Radius.full,
-    borderWidth: 1.5,
-    marginTop: 4,
-    alignSelf: "stretch",
-    justifyContent: "center",
-  },
-  actionBtnText: { fontSize: Typography.size.xs, fontWeight: "700" },
-});

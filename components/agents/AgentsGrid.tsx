@@ -4,9 +4,10 @@
 
 import AgentCard from "@/components/agents/AgentCard";
 import { AgentConfig, AgentMeta } from "@/components/agents/types";
-import { SemanticTheme, Spacing } from "@/constants/Themes";
+import { SemanticTheme } from "@/constants/Themes";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import { styles } from "./styles/AgentsGrid.styles";
 
 type GridItem = {
   agentType: string;
@@ -55,9 +56,3 @@ export default function AgentsGrid({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { gap: Spacing.md },
-  row: { flexDirection: "row", gap: Spacing.md },
-  phantom: { flex: 1 },
-});

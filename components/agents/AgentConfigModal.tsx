@@ -4,7 +4,7 @@
 //  agent configuration via PUT /agents/configure
 // ─────────────────────────────────────────────
 
-import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
+import { SemanticTheme } from "@/constants/Themes";
 import {
   AgentType,
   ALL_PROVIDERS,
@@ -22,11 +22,11 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { styles } from "./styles/AgentConfigModal.styles";
 import { AgentConfig } from "./types";
 
 // ─── Props ────────────────────────────────────
@@ -472,143 +472,3 @@ function DropdownField({
     </View>
   );
 }
-
-// ─── Styles ───────────────────────────────────
-const styles = StyleSheet.create({
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-  kvWrapper: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    borderTopLeftRadius: Radius["2xl"],
-    borderTopRightRadius: Radius["2xl"],
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    paddingBottom: 32,
-    maxHeight: "90%",
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: Spacing.sm,
-    marginBottom: 4,
-  },
-  sheetHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.md,
-  },
-  sheetTitle: { fontSize: Typography.size.lg, fontWeight: "700" },
-  sheetSubtitle: { fontSize: Typography.size.sm, marginTop: 2 },
-  closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: Radius.full,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  formScroll: { flexShrink: 1 },
-  formContent: {
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xs,
-    paddingBottom: Spacing.lg,
-    gap: Spacing.md,
-  },
-  fieldGroup: { gap: 6 },
-  fieldLabel: {
-    fontSize: Typography.size.xs,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.6,
-  },
-  fieldLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  fieldHint: { fontSize: Typography.size.xs },
-  textInput: {
-    borderWidth: 1.5,
-    borderRadius: Radius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Platform.OS === "ios" ? 12 : 10,
-    fontSize: Typography.size.sm,
-  },
-  readonlyBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    borderRadius: Radius.md,
-    borderWidth: 1.5,
-  },
-  readonlyText: { fontSize: Typography.size.sm },
-  dropdownTrigger: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1.5,
-    borderRadius: Radius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Platform.OS === "ios" ? 12 : 10,
-  },
-  dropdownValue: { fontSize: Typography.size.sm, flex: 1 },
-  dropdownList: {
-    borderWidth: 1.5,
-    borderRadius: Radius.md,
-    overflow: "hidden",
-    marginTop: 2,
-  },
-  dropdownOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 11,
-  },
-  dropdownOptionText: { fontSize: Typography.size.sm },
-  errorBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-  },
-  errorText: { fontSize: Typography.size.xs, flex: 1, lineHeight: 18 },
-  actions: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-    marginTop: Spacing.sm,
-  },
-  cancelBtn: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderRadius: Radius.full,
-    paddingVertical: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cancelText: { fontSize: Typography.size.sm, fontWeight: "600" },
-  saveBtn: {
-    flex: 2,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    borderRadius: Radius.full,
-    paddingVertical: 13,
-  },
-  saveText: { fontSize: Typography.size.sm, fontWeight: "700", color: "#fff" },
-});

@@ -4,11 +4,12 @@
 //  currency, then threads both into children.
 // ─────────────────────────────────────────────
 
-import { SemanticTheme, Spacing } from "@/constants/Themes";
+import { SemanticTheme } from "@/constants/Themes";
 import { useUserCurrency } from "@/hooks/useUserCurrency";
 import { ExchangeRates, getExchangeRates } from "@/lib/currency.service";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
+import { s } from "./styles/InventorySummary.styles";
 import { SpendBreakdown } from "./summary/SpendBreakdown";
 import { SpendHero } from "./summary/SpendHero";
 import { Receipt } from "./types";
@@ -42,7 +43,3 @@ export function InventorySummary({ receipts, theme }: Props) {
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  container: { gap: Spacing.sm, marginBottom: Spacing.md },
-});
