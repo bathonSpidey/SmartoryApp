@@ -36,6 +36,12 @@ const NAV_ITEMS: NavItem[] = [
     iconFocused: "bar-chart",
   },
   {
+    route: "agents",
+    label: "Agents",
+    icon: "hardware-chip-outline",
+    iconFocused: "hardware-chip",
+  },
+  {
     route: "profile",
     label: "Profile",
     icon: "person-outline",
