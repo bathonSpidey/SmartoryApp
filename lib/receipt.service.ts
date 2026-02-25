@@ -79,3 +79,59 @@ export async function extractReceipt(
 
   return response.json() as Promise<ExtractReceiptResponse>;
 }
+
+// ─── Inventory: list saved receipts ──────────
+
+export type SavedReceiptItem = {
+  name: string;
+  unit: string;
+  price: number;
+  category: string;
+  quantity: number;
+};
+
+export type SavedReceipt = {
+  id: string;
+  user_id: string;
+  store_name: string;
+  total_amount: number;
+  items: SavedReceiptItem[];
+  raw_response: {
+    date: string;
+    currency: string;
+    type_of_receipt: string;
+    store_name: string;
+    total_amount: number;
+    items: SavedReceiptItem[];
+  };
+  created_at: string;
+};
+
+export type GetReceiptsResponse = {
+  status: "success" | "error";
+  data: SavedReceipt[];
+};
+
+/**
+ * Fetches all saved receipts for the authenticated user.
+ */
+export async function getReceipts(token: string): Promise<SavedReceipt[]> {
+  const res = await fetch(`${BASE_URL}/receipts`, {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+  const json: GetReceiptsResponse = await res.json();
+  if (json.status !== "success")
+    throw new Error("Unexpected response from server");
+
+  return [...json.data].sort(
+    (a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  );
+}

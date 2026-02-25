@@ -1,76 +1,130 @@
-import { Radius, Spacing, Typography } from "@/constants/Themes";
+import { Spacing, Typography } from "@/constants/Themes";
+import { useReceipts } from "@/hooks/useReceipts";
 import { useTheme } from "@/hooks/useTheme";
-import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { InventoryStates } from "../../components/inventory/InventoryStates";
+import { InventorySummary } from "../../components/inventory/InventorySummary";
+import { ReceiptCard } from "../../components/inventory/ReceiptCard";
 
 export default function InventoryScreen() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+  const { receipts, loading, refreshing, error, refresh } = useReceipts();
+
   return (
     <View
       style={[
-        styles.screen,
+        s.screen,
         { paddingTop: insets.top, backgroundColor: theme.background },
       ]}
     >
+      {/* Header */}
       <View
         style={[
-          styles.header,
+          s.header,
           { borderBottomColor: theme.border, backgroundColor: theme.surface },
         ]}
       >
-        <Text style={[styles.title, { color: theme.text }]}>Inventory</Text>
-      </View>
-      <View style={styles.empty}>
-        <View
-          style={[
-            styles.emptyIcon,
-            { backgroundColor: theme.surface, borderColor: theme.border },
-          ]}
-        >
-          <Ionicons name="cube-outline" size={40} color={theme.textDim} />
+        <View>
+          <Text style={[s.title, { color: theme.text }]}>Inventory</Text>
+          <Text style={[s.subtitle, { color: theme.textMuted }]}>
+            Your scanned receipts
+          </Text>
         </View>
-        <Text style={[styles.emptyTitle, { color: theme.text }]}>
-          No items yet
-        </Text>
-        <Text style={[styles.emptySubtitle, { color: theme.textMuted }]}>
-          Your inventory will appear here once you start adding items.
-        </Text>
+        {loading && !refreshing && (
+          <ActivityIndicator size="small" color={theme.primary} />
+        )}
       </View>
+
+      {/* Content */}
+      {loading && !refreshing ? (
+        <ScrollView
+          contentContainerStyle={[
+            s.list,
+            { paddingBottom: insets.bottom + Spacing.xl },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          <InventoryStates.Skeleton theme={theme} />
+          <InventoryStates.Skeleton theme={theme} />
+          <InventoryStates.Skeleton theme={theme} />
+        </ScrollView>
+      ) : error ? (
+        <InventoryStates.Error
+          message={error}
+          onRetry={refresh}
+          theme={theme}
+        />
+      ) : (
+        <ScrollView
+          contentContainerStyle={[
+            s.list,
+            { paddingBottom: insets.bottom + Spacing.xl },
+          ]}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refresh}
+              tintColor={theme.primary}
+              colors={[theme.primary]}
+            />
+          }
+        >
+          {receipts.length === 0 ? (
+            <InventoryStates.Empty theme={theme} />
+          ) : (
+            <>
+              <InventorySummary receipts={receipts} theme={theme} />
+              <Text style={[s.sectionLabel, { color: theme.textMuted }]}>
+                {receipts.length} receipt{receipts.length !== 1 ? "s" : ""}
+              </Text>
+              {receipts.map((receipt) => (
+                <ReceiptCard key={receipt.id} receipt={receipt} theme={theme} />
+              ))}
+            </>
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   screen: { flex: 1 },
   header: {
     paddingHorizontal: Spacing.screenPadding,
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-  },
-  title: { fontSize: Typography.size.xl, fontWeight: "700" },
-  empty: {
-    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: Spacing["4xl"],
-    gap: Spacing.sm,
+    justifyContent: "space-between",
   },
-  emptyIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: Radius.xl,
-    borderWidth: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  title: {
+    fontSize: Typography.size.xl,
+    fontWeight: "700",
+    letterSpacing: -0.4,
+  },
+  subtitle: { fontSize: Typography.size.xs, fontWeight: "500", marginTop: 1 },
+  list: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: Spacing.lg,
+    flexGrow: 1,
+  },
+  sectionLabel: {
+    fontSize: Typography.size.xs,
+    fontWeight: "700",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
     marginBottom: Spacing.sm,
-  },
-  emptyTitle: { fontSize: Typography.size.md, fontWeight: "700" },
-  emptySubtitle: {
-    fontSize: Typography.size.sm,
-    textAlign: "center",
-    lineHeight: 20,
   },
 });
