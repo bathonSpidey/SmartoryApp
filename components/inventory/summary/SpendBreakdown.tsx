@@ -67,7 +67,7 @@ export function SpendBreakdown({
       if (!catData[item.category])
         catData[item.category] = { spend: 0, items: 0, trips: new Set() };
       catData[item.category].spend += convertAmount(
-        item.price * item.quantity,
+        item.price,
         fromCur,
         preferredCurrency,
         rates,
