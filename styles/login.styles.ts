@@ -209,6 +209,10 @@ export const styles = StyleSheet.create({
     height: "100%",
     ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
   },
+  eyeButton: {
+    padding: 4,
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
+  },
 
   // ── Button ────────────────────────────────
   button: {

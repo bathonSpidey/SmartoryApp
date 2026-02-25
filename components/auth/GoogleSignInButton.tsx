@@ -1,5 +1,17 @@
 import React, { useRef } from "react";
-import { Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Image,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+} from "react-native";
+
+// Official Google "G" mark — four-color SVG encoded as base64 data URI.
+// No external image file or SVG library required.
+const GOOGLE_G_URI =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIyLjU2IDEyLjI1YzAtLjc4LS4wNy0xLjUzLS4yLTIuMjVIMTJ2NC4yNmg1LjkyYy0uMjYgMS4zNy0xLjA0IDIuNTMtMi4yMSAzLjMxdjIuNzdoMy41N2MyLjA4LTEuOTIgMy4yOC00Ljc0IDMuMjgtOC4wOXoiIGZpbGw9IiM0Mjg1RjQiLz48cGF0aCBkPSJNMTIgMjNjMi45NyAwIDUuNDYtLjk4IDcuMjgtMi42NmwtMy41Ny0yLjc3Yy0uOTguNjYtMi4yMyAxLjA2LTMuNzEgMS4wNi0yLjg2IDAtNS4yOS0xLjkzLTYuMTYtNC41M0gyLjE4djIuODRDMy45OSAyMC41MyA3LjcgMjMgMTIgMjN6IiBmaWxsPSIjMzRBODUzIi8+PHBhdGggZD0iTTUuODQgMTQuMDljLS4yMi0uNjYtLjM1LTEuMzYtLjM1LTIuMDlzLjEzLTEuNDMuMzUtMi4wOVY3LjA3SDIuMThDMS40MyA4LjU1IDEgMTAuMjIgMSAxMnMuNDMgMy40NSAxLjE4IDQuOTNsMi44NS0yLjIyLjgxLS42MnoiIGZpbGw9IiNGQkJDMDUiLz48cGF0aCBkPSJNMTIgNS4zOGMxLjYyIDAgMy4wNi41NiA0LjIxIDEuNjRsMy4xNS0zLjE1QzE3LjQ1IDIuMDkgMTQuOTcgMSAxMiAxQzcuNyAxIDMuOTkgMy40NyAyLjE4IDcuMDdsMy42NiAyLjg0Yy44Ny0yLjYgMy4zLTQuNTMgNi4xNi00LjUzeiIgZmlsbD0iI0VBNDMzNSIvPjwvc3ZnPg==";
 
 interface GoogleSignInButtonProps {
   onPress: () => void;
@@ -35,10 +47,12 @@ export function GoogleSignInButton({
           { transform: [{ scale }], opacity: loading ? 0.6 : 1 },
         ]}
       >
-        {/* Google "G" — no image dependency */}
-        <View style={s.gLogo}>
-          <Text style={s.gText}>G</Text>
-        </View>
+        {/* Official Google "G" mark */}
+        <Image
+          source={{ uri: GOOGLE_G_URI }}
+          style={s.gLogo}
+          resizeMode="contain"
+        />
         <Text style={s.label}>
           {loading ? "Connecting…" : "Continue with Google"}
         </Text>
@@ -63,16 +77,6 @@ const s = StyleSheet.create({
   gLogo: {
     width: 20,
     height: 20,
-    borderRadius: 10,
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  gText: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#4285F4",
-    letterSpacing: -0.2,
   },
   label: {
     color: "#dff0ed",

@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -36,6 +37,8 @@ export default function LoginScreen() {
   const [confirmFocused, setConfirmFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
   const cardAnim = useRef(new Animated.Value(0)).current;
@@ -58,6 +61,8 @@ export default function LoginScreen() {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const handlePressIn = () =>
@@ -170,13 +175,23 @@ export default function LoginScreen() {
                 <IsoCube size={42} />
                 <Text style={styles.logoText}>Smartory</Text>
               </View>
-              <Text style={styles.tagline}>
-                Inventory,{"\n"}simplified.
-              </Text>
+              <Text style={styles.tagline}>Inventory,{"\n"}simplified.</Text>
               <View style={styles.statsRow}>
-                <StatPill label="Real-time updates" value="Live Stock" delay={500} />
-                <StatPill label="Low inventory" value="Smart Alerts" delay={700} />
-                <StatPill label="Multi-location" value="All in one" delay={900} />
+                <StatPill
+                  label="Real-time updates"
+                  value="Live Stock"
+                  delay={500}
+                />
+                <StatPill
+                  label="Low inventory"
+                  value="Smart Alerts"
+                  delay={700}
+                />
+                <StatPill
+                  label="Multi-location"
+                  value="All in one"
+                  delay={900}
+                />
               </View>
             </View>
 
@@ -261,17 +276,33 @@ export default function LoginScreen() {
                       passFocused && styles.inputWrapFocused,
                     ]}
                   >
-                    <Text style={styles.inputIcon}>⬤</Text>
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={15}
+                      color="#3d706a"
+                      style={{ width: 16, textAlign: "center" }}
+                    />
                     <TextInput
                       style={styles.input}
                       placeholder="••••••••••"
                       placeholderTextColor="#4b7b78"
                       value={password}
                       onChangeText={setPassword}
-                      secureTextEntry
+                      secureTextEntry={!showPassword}
                       onFocus={() => setPassFocused(true)}
                       onBlur={() => setPassFocused(false)}
                     />
+                    <Pressable
+                      onPress={() => setShowPassword((v) => !v)}
+                      style={styles.eyeButton}
+                      hitSlop={8}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye-outline" : "eye-off-outline"}
+                        size={18}
+                        color="#3d706a"
+                      />
+                    </Pressable>
                   </View>
                 </View>
 
@@ -285,17 +316,37 @@ export default function LoginScreen() {
                         confirmFocused && styles.inputWrapFocused,
                       ]}
                     >
-                      <Text style={styles.inputIcon}>⬤</Text>
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={15}
+                        color="#3d706a"
+                        style={{ width: 16, textAlign: "center" }}
+                      />
                       <TextInput
                         style={styles.input}
                         placeholder="••••••••••"
                         placeholderTextColor="#4b7b78"
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
-                        secureTextEntry
+                        secureTextEntry={!showConfirmPassword}
                         onFocus={() => setConfirmFocused(true)}
                         onBlur={() => setConfirmFocused(false)}
                       />
+                      <Pressable
+                        onPress={() => setShowConfirmPassword((v) => !v)}
+                        style={styles.eyeButton}
+                        hitSlop={8}
+                      >
+                        <Ionicons
+                          name={
+                            showConfirmPassword
+                              ? "eye-outline"
+                              : "eye-off-outline"
+                          }
+                          size={18}
+                          color="#3d706a"
+                        />
+                      </Pressable>
                     </View>
                   </View>
                 )}
