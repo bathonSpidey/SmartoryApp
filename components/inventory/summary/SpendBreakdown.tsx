@@ -41,7 +41,8 @@ export function SpendBreakdown({
   preferredCurrency,
   rates,
 }: Props) {
-  const [tab, setTab] = useState<Tab>("month");
+  // Default to "all" so the card is always visible regardless of when receipts were scanned
+  const [tab, setTab] = useState<Tab>("all");
   const [activeCat, setActiveCat] = useState<string | null>(null);
 
   const filtered = filterByTab(receipts, tab);
@@ -81,8 +82,6 @@ export function SpendBreakdown({
 
   const maxSpend = sortedCats[0]?.[1].spend ?? 1;
   const topCat = sortedCats[0]?.[0] ?? null;
-
-  if (sortedCats.length === 0) return null;
 
   return (
     <View
@@ -147,69 +146,78 @@ export function SpendBreakdown({
       </View>
 
       {/* ── Category rows ── */}
-      <View style={s.rows}>
-        {sortedCats.map(([cat, data]) => {
-          const color = getCategoryColor(cat);
-          const pct =
-            totalSpend > 0 ? Math.round((data.spend / totalSpend) * 100) : 0;
-          const barPct = (data.spend / maxSpend) * 100;
-          const isActive = activeCat === cat;
-          const avgPerTrip =
-            data.trips.size > 0 ? data.spend / data.trips.size : 0;
+      {sortedCats.length === 0 ? (
+        <View style={s.emptyState}>
+          <Ionicons name="receipt-outline" size={22} color={theme.textMuted} />
+          <Text style={[s.emptyText, { color: theme.textMuted }]}>
+            No spending data for this period
+          </Text>
+        </View>
+      ) : (
+        <View style={s.rows}>
+          {sortedCats.map(([cat, data]) => {
+            const color = getCategoryColor(cat);
+            const pct =
+              totalSpend > 0 ? Math.round((data.spend / totalSpend) * 100) : 0;
+            const barPct = (data.spend / maxSpend) * 100;
+            const isActive = activeCat === cat;
+            const avgPerTrip =
+              data.trips.size > 0 ? data.spend / data.trips.size : 0;
 
-          return (
-            <Pressable
-              key={cat}
-              onPress={() => setActiveCat(isActive ? null : cat)}
-              style={({ pressed }) => [
-                s.row,
-                isActive && {
-                  backgroundColor: color + "0f",
-                  borderRadius: Radius.md,
-                },
-                pressed && { opacity: 0.75 },
-              ]}
-            >
-              <View style={s.rowInner}>
-                <View style={s.rowLeft}>
-                  <View style={[s.colorDot, { backgroundColor: color }]} />
-                  <Text
-                    style={[s.catName, { color: theme.text }]}
-                    numberOfLines={1}
-                  >
-                    {cat}
-                  </Text>
+            return (
+              <Pressable
+                key={cat}
+                onPress={() => setActiveCat(isActive ? null : cat)}
+                style={({ pressed }) => [
+                  s.row,
+                  isActive && {
+                    backgroundColor: color + "0f",
+                    borderRadius: Radius.md,
+                  },
+                  pressed && { opacity: 0.75 },
+                ]}
+              >
+                <View style={s.rowInner}>
+                  <View style={s.rowLeft}>
+                    <View style={[s.colorDot, { backgroundColor: color }]} />
+                    <Text
+                      style={[s.catName, { color: theme.text }]}
+                      numberOfLines={1}
+                    >
+                      {cat}
+                    </Text>
+                  </View>
+                  <View style={s.barTrack}>
+                    <View
+                      style={[
+                        s.barFill,
+                        { backgroundColor: color, width: `${barPct}%` as any },
+                      ]}
+                    />
+                  </View>
+                  <View style={s.rowRight}>
+                    <Text style={[s.spendText, { color: theme.text }]}>
+                      {symbol}
+                      {data.spend.toFixed(0)}
+                    </Text>
+                    <Text style={[s.pctText, { color: theme.textMuted }]}>
+                      {pct}%
+                    </Text>
+                  </View>
                 </View>
-                <View style={s.barTrack}>
-                  <View
-                    style={[
-                      s.barFill,
-                      { backgroundColor: color, width: `${barPct}%` as any },
-                    ]}
-                  />
-                </View>
-                <View style={s.rowRight}>
-                  <Text style={[s.spendText, { color: theme.text }]}>
-                    {symbol}
-                    {data.spend.toFixed(0)}
-                  </Text>
-                  <Text style={[s.pctText, { color: theme.textMuted }]}>
-                    {pct}%
-                  </Text>
-                </View>
-              </View>
-              {isActive && (
-                <View style={[s.detail, { borderTopColor: color + "33" }]}>
-                  <Text style={[s.detailText, { color: theme.textMuted }]}>
-                    {data.items} items · avg {symbol}
-                    {avgPerTrip.toFixed(2)} per trip
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-          );
-        })}
-      </View>
+                {isActive && (
+                  <View style={[s.detail, { borderTopColor: color + "33" }]}>
+                    <Text style={[s.detailText, { color: theme.textMuted }]}>
+                      {data.items} items · avg {symbol}
+                      {avgPerTrip.toFixed(2)} per trip
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
     </View>
   );
 }
@@ -278,4 +286,11 @@ const s = StyleSheet.create({
     paddingHorizontal: 2,
   },
   detailText: { fontSize: 11, fontWeight: "500" },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 24,
+  },
+  emptyText: { fontSize: 13, fontWeight: "500" },
 });
