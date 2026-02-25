@@ -1,12 +1,13 @@
-import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
+import { Radius, SemanticTheme } from "@/constants/Themes";
 import { CURRENCY_SYMBOLS, CurrencyCode } from "@/constants/currencies";
 import { convertAmount, ExchangeRates } from "@/lib/currency.service";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { getCategoryColor } from "../categoryColors";
 import { Receipt } from "../types";
 import { receiptDate } from "./dateUtils";
+import { s } from "./styles/SpendBreakdown.s";
 
 type Tab = "month" | "year" | "all";
 const TABS: { key: Tab; label: string }[] = [
@@ -221,76 +222,3 @@ export function SpendBreakdown({
     </View>
   );
 }
-
-const s = StyleSheet.create({
-  card: {
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    padding: Spacing.md,
-    gap: Spacing.md,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: {
-    fontSize: Typography.size.sm,
-    fontWeight: "700",
-    letterSpacing: -0.2,
-  },
-  insightPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: Radius.full,
-    borderWidth: 1,
-  },
-  insightText: { fontSize: 11, fontWeight: "700" },
-  tabRow: { flexDirection: "row", borderRadius: Radius.md, padding: 3, gap: 2 },
-  tab: {
-    flex: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 4,
-    borderRadius: Radius.sm,
-    alignItems: "center",
-  },
-  tabText: { fontSize: 11, fontWeight: "500", letterSpacing: 0.1 },
-  rows: { gap: 4 },
-  row: { paddingVertical: 6, paddingHorizontal: 6 },
-  rowInner: { flexDirection: "row", alignItems: "center", gap: Spacing.sm },
-  rowLeft: { flexDirection: "row", alignItems: "center", gap: 6, width: 88 },
-  colorDot: { width: 8, height: 8, borderRadius: 4, flexShrink: 0 },
-  catName: { fontSize: Typography.size.xs, fontWeight: "600", flex: 1 },
-  barTrack: {
-    flex: 1,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "rgba(120,120,128,0.12)",
-    overflow: "hidden",
-  },
-  barFill: { height: 6, borderRadius: 3, minWidth: 4 },
-  rowRight: { width: 58, alignItems: "flex-end", gap: 1 },
-  spendText: {
-    fontSize: Typography.size.xs,
-    fontWeight: "700",
-    letterSpacing: -0.2,
-  },
-  pctText: { fontSize: 10, fontWeight: "500" },
-  detail: {
-    marginTop: 6,
-    paddingTop: 6,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 2,
-  },
-  detailText: { fontSize: 11, fontWeight: "500" },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 24,
-  },
-  emptyText: { fontSize: 13, fontWeight: "500" },
-});

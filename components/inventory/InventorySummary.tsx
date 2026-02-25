@@ -10,6 +10,7 @@ import { ExchangeRates, getExchangeRates } from "@/lib/currency.service";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { s } from "./styles/InventorySummary.styles";
+import { ChatInventoryWindow } from "./summary/ChatInventoryWindow";
 import { SpendBreakdown } from "./summary/SpendBreakdown";
 import { SpendHero } from "./summary/SpendHero";
 import { Receipt } from "./types";
@@ -40,6 +41,7 @@ export function InventorySummary({ receipts, theme }: Props) {
         preferredCurrency={currency}
         rates={rates}
       />
+      <ChatInventoryWindow theme={theme} />
     </View>
   );
 }
