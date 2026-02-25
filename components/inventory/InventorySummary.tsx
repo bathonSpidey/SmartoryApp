@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────
-//  InventorySummary — Stats strip above the list
-//  Shows total receipts, items, and spend lines.
-//  Modular: pass receipts array + theme, done.
+//  InventorySummary — Conversational spending
+//  snapshot. Designed for clarity-first UX:
+//  plain language, spend breakdown with bars,
+//  and a human insight headline.
 // ─────────────────────────────────────────────
 
 import { Radius, SemanticTheme, Spacing, Typography } from "@/constants/Themes";
@@ -11,123 +12,196 @@ import { StyleSheet, Text, View } from "react-native";
 import { getCategoryColor } from "./categoryColors";
 import { Receipt } from "./types";
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  CAD: "C$",
+  AUD: "A$",
+  INR: "₹",
+  CHF: "Fr ",
+  CNY: "¥",
+};
+
 type Props = {
   receipts: Receipt[];
   theme: SemanticTheme;
 };
 
-type StatCardProps = {
-  icon: React.ComponentProps<typeof Ionicons>["name"];
-  iconColor: string;
-  label: string;
-  value: string;
-  theme: SemanticTheme;
-};
-
-function StatCard({ icon, iconColor, label, value, theme }: StatCardProps) {
-  return (
-    <View
-      style={[
-        styles.statCard,
-        {
-          backgroundColor: theme.surface,
-          borderColor: theme.border,
-          ...theme.shadowCard,
-        },
-      ]}
-    >
-      <View style={[styles.statIconBox, { backgroundColor: iconColor + "1a" }]}>
-        <Ionicons name={icon} size={18} color={iconColor} />
-      </View>
-      <Text style={[styles.statValue, { color: theme.text }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: theme.textMuted }]}>
-        {label}
-      </Text>
-    </View>
-  );
-}
-
 export function InventorySummary({ receipts, theme }: Props) {
   const totalItems = receipts.reduce((s, r) => s + r.items.length, 0);
+  const uniqueStores = new Set(receipts.map((r) => r.store_name.toLowerCase()))
+    .size;
 
-  // Group totals by currency
+  // Primary currency (most used) + total spent in it
   const spendByCurrency: Record<string, number> = {};
   for (const r of receipts) {
     const cur = r.raw_response.currency ?? "USD";
     spendByCurrency[cur] = (spendByCurrency[cur] ?? 0) + r.total_amount;
   }
-  const spendLines = Object.entries(spendByCurrency).map(
-    ([cur, total]) => `${CURRENCY_SYMBOLS[cur] ?? cur}${total.toFixed(2)}`,
-  );
-  const spendDisplay = spendLines.join(" + ") || "—";
+  const [[primaryCurrency, primaryTotal]] = Object.entries(
+    spendByCurrency,
+  ).sort((a, b) => b[1] - a[1]);
+  const symbol = CURRENCY_SYMBOLS[primaryCurrency] ?? primaryCurrency + " ";
+  const totalSpend = primaryTotal;
 
-  // Top category by item count
-  const catCounts: Record<string, number> = {};
+  // Spend by category (sum of item price × qty)
+  const catSpend: Record<string, number> = {};
   for (const r of receipts) {
     for (const item of r.items) {
-      catCounts[item.category] =
-        (catCounts[item.category] ?? 0) + item.quantity;
+      catSpend[item.category] =
+        (catSpend[item.category] ?? 0) + item.price * item.quantity;
     }
   }
-  const sortedCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
+  const sortedCats = Object.entries(catSpend)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
   const topCat = sortedCats[0]?.[0] ?? null;
+  const maxCatSpend = sortedCats[0]?.[1] ?? 1;
+
+  // Largest single receipt
+  const biggestReceipt = receipts.reduce(
+    (max, r) => (r.total_amount > max.total_amount ? r : max),
+    receipts[0],
+  );
 
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <StatCard
-          icon="receipt-outline"
-          iconColor={theme.primary}
-          label="Receipts"
-          value={String(receipts.length)}
-          theme={theme}
-        />
-        <StatCard
-          icon="cube-outline"
-          iconColor="#7c3aed"
-          label="Items"
-          value={String(totalItems)}
-          theme={theme}
-        />
-        <StatCard
-          icon="wallet-outline"
-          iconColor="#d97706"
-          label="Spent"
-          value={spendDisplay}
-          theme={theme}
-        />
+      {/* ── Hero spend card ── */}
+      <View
+        style={[
+          styles.heroCard,
+          {
+            backgroundColor: theme.primary,
+          },
+        ]}
+      >
+        <Text style={styles.heroLabel}>You've spent</Text>
+        <Text style={styles.heroAmount}>
+          {symbol}
+          {totalSpend.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </Text>
+        <View style={styles.heroMeta}>
+          <View style={styles.heroMetaItem}>
+            <Ionicons
+              name="storefront-outline"
+              size={13}
+              color="rgba(255,255,255,0.75)"
+            />
+            <Text style={styles.heroMetaText}>
+              {uniqueStores} {uniqueStores === 1 ? "store" : "stores"}
+            </Text>
+          </View>
+          <View style={styles.heroMetaDot} />
+          <View style={styles.heroMetaItem}>
+            <Ionicons
+              name="cube-outline"
+              size={13}
+              color="rgba(255,255,255,0.75)"
+            />
+            <Text style={styles.heroMetaText}>
+              {totalItems} {totalItems === 1 ? "item" : "items"}
+            </Text>
+          </View>
+          {biggestReceipt && (
+            <>
+              <View style={styles.heroMetaDot} />
+              <View style={styles.heroMetaItem}>
+                <Ionicons
+                  name="trending-up-outline"
+                  size={13}
+                  color="rgba(255,255,255,0.75)"
+                />
+                <Text style={styles.heroMetaText} numberOfLines={1}>
+                  Most at {titleCase(biggestReceipt.store_name)}
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
       </View>
 
-      {/* Top category bar */}
+      {/* ── Where it went ── */}
       {sortedCats.length > 0 && (
         <View
           style={[
-            styles.catBar,
+            styles.breakdownCard,
             { backgroundColor: theme.surface, borderColor: theme.border },
           ]}
         >
-          <Text style={[styles.catBarLabel, { color: theme.textMuted }]}>
-            Top categories
-          </Text>
-          <View style={styles.catBarChips}>
-            {sortedCats.slice(0, 5).map(([cat, count]) => {
-              const color = getCategoryColor(cat);
-              return (
-                <View
-                  key={cat}
+          <View style={styles.breakdownHeader}>
+            <Text style={[styles.breakdownTitle, { color: theme.text }]}>
+              Where it went
+            </Text>
+            {topCat && (
+              <View
+                style={[
+                  styles.insightPill,
+                  {
+                    backgroundColor: getCategoryColor(topCat) + "18",
+                    borderColor: getCategoryColor(topCat) + "33",
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="sparkles"
+                  size={11}
+                  color={getCategoryColor(topCat)}
+                />
+                <Text
                   style={[
-                    styles.catChip,
-                    {
-                      backgroundColor: color + "18",
-                      borderColor: color + "33",
-                    },
+                    styles.insightText,
+                    { color: getCategoryColor(topCat) },
                   ]}
                 >
-                  <View style={[styles.catDot, { backgroundColor: color }]} />
-                  <Text style={[styles.catChipName, { color }]}>{cat}</Text>
-                  <Text style={[styles.catChipCount, { color: theme.textDim }]}>
-                    {count}
-                  </Text>
+                  {topCat} leads
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.catRows}>
+            {sortedCats.map(([cat, spend]) => {
+              const color = getCategoryColor(cat);
+              const pct = Math.round((spend / totalSpend) * 100);
+              const barWidth = (spend / maxCatSpend) * 100;
+              return (
+                <View key={cat} style={styles.catRow}>
+                  <View style={styles.catRowLeft}>
+                    <View
+                      style={[styles.catColorDot, { backgroundColor: color }]}
+                    />
+                    <Text
+                      style={[styles.catName, { color: theme.text }]}
+                      numberOfLines={1}
+                    >
+                      {cat}
+                    </Text>
+                  </View>
+                  <View style={styles.catBarTrack}>
+                    <View
+                      style={[
+                        styles.catBarFill,
+                        {
+                          backgroundColor: color,
+                          width: `${barWidth}%` as any,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <View style={styles.catRowRight}>
+                    <Text style={[styles.catSpend, { color: theme.text }]}>
+                      {symbol}
+                      {spend.toFixed(0)}
+                    </Text>
+                    <Text style={[styles.catPct, { color: theme.textMuted }]}>
+                      {pct}%
+                    </Text>
+                  </View>
                 </View>
               );
             })}
@@ -138,90 +212,140 @@ export function InventorySummary({ receipts, theme }: Props) {
   );
 }
 
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  AUD: "A$",
-  INR: "₹",
-};
+function titleCase(str: string) {
+  return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 const styles = StyleSheet.create({
   container: {
     gap: Spacing.sm,
     marginBottom: Spacing.md,
   },
-  row: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-  },
-  statCard: {
-    flex: 1,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    padding: Spacing.md,
-    alignItems: "flex-start",
-    gap: 4,
-  },
-  statIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: Radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 2,
-  },
-  statValue: {
-    fontSize: Typography.size.lg,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  statLabel: {
-    fontSize: Typography.size.xs,
-    fontWeight: "500",
-    letterSpacing: 0.2,
-  },
 
-  // ── Category bar ──
-  catBar: {
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    padding: Spacing.md,
-    gap: Spacing.sm,
-  },
-  catBarLabel: {
-    fontSize: Typography.size.xs,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-  },
-  catBarChips: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+  // ── Hero ──
+  heroCard: {
+    borderRadius: Radius.xl,
+    padding: Spacing.lg,
     gap: 6,
   },
-  catChip: {
+  heroLabel: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: Typography.size.sm,
+    fontWeight: "600",
+    letterSpacing: 0.2,
+  },
+  heroAmount: {
+    color: "#fff",
+    fontSize: 36,
+    fontWeight: "800",
+    letterSpacing: -1.5,
+    lineHeight: 40,
+  },
+  heroMeta: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    gap: 6,
+    marginTop: 2,
+    flexWrap: "wrap",
+  },
+  heroMetaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  heroMetaText: {
+    color: "rgba(255,255,255,0.75)",
+    fontSize: Typography.size.xs,
+    fontWeight: "500",
+  },
+  heroMetaDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: "rgba(255,255,255,0.4)",
+  },
+
+  // ── Breakdown card ──
+  breakdownCard: {
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    padding: Spacing.md,
+    gap: Spacing.md,
+  },
+  breakdownHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  breakdownTitle: {
+    fontSize: Typography.size.sm,
+    fontWeight: "700",
+    letterSpacing: -0.2,
+  },
+  insightPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: Radius.full,
     borderWidth: 1,
   },
-  catDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  insightText: {
+    fontSize: 11,
+    fontWeight: "700",
   },
-  catChipName: {
+
+  // ── Category rows ──
+  catRows: {
+    gap: 10,
+  },
+  catRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
+  catRowLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    width: 90,
+  },
+  catColorDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    flexShrink: 0,
+  },
+  catName: {
     fontSize: Typography.size.xs,
     fontWeight: "600",
+    flex: 1,
   },
-  catChipCount: {
-    fontSize: 10,
+  catBarTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(120,120,128,0.12)",
+    overflow: "hidden",
+  },
+  catBarFill: {
+    height: 6,
+    borderRadius: 3,
+    minWidth: 4,
+  },
+  catRowRight: {
+    width: 60,
+    alignItems: "flex-end",
+    gap: 1,
+  },
+  catSpend: {
+    fontSize: Typography.size.xs,
     fontWeight: "700",
+    letterSpacing: -0.2,
+  },
+  catPct: {
+    fontSize: 10,
+    fontWeight: "500",
   },
 });

@@ -46,10 +46,7 @@ export function ReceiptCard({
   const storeColor = getStoreColor(receipt.store_name);
   const currency = receipt.raw_response.currency ?? "USD";
   const symbol = CURRENCY_SYMBOLS[currency] ?? currency + " ";
-  const date = formatReceiptDate(
-    receipt.raw_response.date ?? receipt.created_at,
-  );
-  const receiptType = receipt.raw_response.type_of_receipt ?? "Receipt";
+  const date = relativeDate(receipt.raw_response.date ?? receipt.created_at);
   const storeInitial = receipt.store_name.trim()[0]?.toUpperCase() ?? "?";
 
   // Unique categories used in this receipt
@@ -108,26 +105,9 @@ export function ReceiptCard({
             >
               {titleCase(receipt.store_name)}
             </Text>
-            <View style={styles.metaRow}>
-              {/* Receipt type badge */}
-              <View
-                style={[
-                  styles.typeBadge,
-                  {
-                    backgroundColor: storeColor + "18",
-                    borderColor: storeColor + "33",
-                  },
-                ]}
-              >
-                <Text style={[styles.typeBadgeText, { color: storeColor }]}>
-                  {receiptType}
-                </Text>
-              </View>
-              <Text style={[styles.dateDot, { color: theme.textDim }]}>·</Text>
-              <Text style={[styles.dateText, { color: theme.textMuted }]}>
-                {date}
-              </Text>
-            </View>
+            <Text style={[styles.dateText, { color: theme.textMuted }]}>
+              {date}
+            </Text>
           </View>
 
           {/* Total + chevron */}
@@ -135,9 +115,6 @@ export function ReceiptCard({
             <Text style={[styles.totalAmount, { color: theme.text }]}>
               {symbol}
               {receipt.total_amount.toFixed(2)}
-            </Text>
-            <Text style={[styles.currency, { color: theme.textDim }]}>
-              {currency}
             </Text>
           </View>
 
@@ -209,41 +186,54 @@ function titleCase(str: string) {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function formatReceiptDate(raw: string): string {
-  if (!raw) return "";
-  // Try common formats: "10/17/2020", "31.12.2025", ISO
+function parseReceiptDate(raw: string): Date | null {
+  if (!raw) return null;
   const slashMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if (slashMatch) {
     const [, m, d, y] = slashMatch;
-    return new Date(
-      `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`,
-    ).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return new Date(`${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`);
   }
   const dotMatch = raw.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
   if (dotMatch) {
     const [, d, m, y] = dotMatch;
-    return new Date(
-      `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`,
-    ).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return new Date(`${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`);
   }
-  // ISO or unknown — try parsing directly
   try {
-    return new Date(raw).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    const d = new Date(raw);
+    return isNaN(d.getTime()) ? null : d;
   } catch {
-    return raw;
+    return null;
   }
+}
+
+function relativeDate(raw: string): string {
+  const date = parseReceiptDate(raw);
+  if (!date) return raw;
+
+  const now = new Date();
+  // Compare calendar days (ignore time)
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateStart = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
+  const diffDays = Math.round(
+    (todayStart.getTime() - dateStart.getTime()) / 86_400_000,
+  );
+
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 14) return "Last week";
+
+  // Older: show "Jan 5" or "Jan 5, 2023" if different year
+  const sameYear = date.getFullYear() === now.getFullYear();
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(sameYear ? {} : { year: "numeric" }),
+  });
 }
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
@@ -298,33 +288,13 @@ const styles = StyleSheet.create({
   },
   storeInfo: {
     flex: 1,
-    gap: 5,
+    gap: 3,
     minWidth: 0,
   },
   storeName: {
     fontSize: Typography.size.md,
     fontWeight: "700",
     letterSpacing: -0.2,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    flexWrap: "wrap",
-  },
-  typeBadge: {
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: Radius.full,
-    borderWidth: 1,
-  },
-  typeBadgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.3,
-  },
-  dateDot: {
-    fontSize: 12,
   },
   dateText: {
     fontSize: Typography.size.xs,
@@ -338,12 +308,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.lg,
     fontWeight: "800",
     letterSpacing: -0.5,
-  },
-  currency: {
-    fontSize: 10,
-    fontWeight: "600",
-    letterSpacing: 0.5,
-    textAlign: "right",
   },
   chevronBox: {
     width: 26,
