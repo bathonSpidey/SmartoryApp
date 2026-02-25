@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, View } from "react-native";
+import { Animated, Easing, StyleSheet, View } from "react-native";
 
 // ── Types ─────────────────────────────────────
 
@@ -150,6 +150,3 @@ export function AmbientBackground() {
     </>
   );
 }
-
-import { StyleSheet } from "react-native";
-

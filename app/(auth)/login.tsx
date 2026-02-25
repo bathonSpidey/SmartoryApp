@@ -1,28 +1,29 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    Animated,
-    Easing,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Animated,
+  Easing,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AmbientBackground } from "../../components/auth/Ambientbackground";
+import { GoogleSignInButton } from "../../components/auth/GoogleSignInButton";
+import { IsoCube } from "../../components/auth/Isocube";
+import { StatPill } from "../../components/auth/Statpill";
 import {
-    loginWithEmail,
-    loginWithGoogle,
-    signUpWithEmail,
-} from "./auth.service";
-import { AmbientBackground } from "./components/Ambientbackground";
-import { GoogleSignInButton } from "./components/GoogleSignInButton";
-import { IsoCube } from "./components/Isocube";
-import { StatPill } from "./components/Statpill";
-import { styles } from "./login.styles";
+  loginWithEmail,
+  loginWithGoogle,
+  signUpWithEmail,
+} from "../../lib/auth.service";
+import { styles } from "../../lib/login.styles";
+import React from "react";
 
 type Tab = "signin" | "signup";
 
@@ -187,7 +188,11 @@ export default function LoginScreen() {
                   delay={500}
                 />
                 <StatPill label="Agents" value="Manage" delay={700} />
-                <StatPill label="on expiring items" value="Get Alerts" delay={900} />
+                <StatPill
+                  label="on expiring items"
+                  value="Get Alerts"
+                  delay={900}
+                />
               </View>
             </View>
 

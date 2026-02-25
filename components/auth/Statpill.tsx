@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, Text } from "react-native";
-import { styles } from "../login.styles";
+import { styles } from "../../lib/login.styles";
 
 interface StatPillProps {
   label: string;
