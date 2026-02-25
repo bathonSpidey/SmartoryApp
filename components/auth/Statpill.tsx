@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing, Text } from "react-native";
-import { styles } from "../../lib/login.styles";
+import { styles } from "../../styles/login.styles";
 
 interface StatPillProps {
   label: string;
@@ -39,6 +39,7 @@ export function StatPill({ label, value, delay }: StatPillProps) {
       ]}
     >
       <Text style={styles.statValue}>{value}</Text>
+      <Text style={[styles.statLabel, { opacity: 0.35 }]}>{"\u00b7"}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </Animated.View>
   );

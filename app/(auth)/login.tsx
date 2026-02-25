@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -22,8 +22,7 @@ import {
   loginWithGoogle,
   signUpWithEmail,
 } from "../../lib/auth.service";
-import { styles } from "../../lib/login.styles";
-import React from "react";
+import { styles } from "../../styles/login.styles";
 
 type Tab = "signin" | "signup";
 
@@ -41,7 +40,6 @@ export default function LoginScreen() {
   const router = useRouter();
   const cardAnim = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
-  const tabSlide = useRef(new Animated.Value(0)).current;
 
   // Card entry
   useEffect(() => {
@@ -60,12 +58,6 @@ export default function LoginScreen() {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
-    Animated.spring(tabSlide, {
-      toValue: next === "signin" ? 0 : 1,
-      friction: 7,
-      tension: 120,
-      useNativeDriver: true,
-    }).start();
   };
 
   const handlePressIn = () =>
@@ -179,20 +171,12 @@ export default function LoginScreen() {
                 <Text style={styles.logoText}>Smartory</Text>
               </View>
               <Text style={styles.tagline}>
-                Manage your Inventory.{"\n"}Uplift your life.
+                Inventory,{"\n"}simplified.
               </Text>
               <View style={styles.statsRow}>
-                <StatPill
-                  label="to get Insights"
-                  value="Customized Agents"
-                  delay={500}
-                />
-                <StatPill label="Agents" value="Manage" delay={700} />
-                <StatPill
-                  label="on expiring items"
-                  value="Get Alerts"
-                  delay={900}
-                />
+                <StatPill label="Real-time updates" value="Live Stock" delay={500} />
+                <StatPill label="Low inventory" value="Smart Alerts" delay={700} />
+                <StatPill label="Multi-location" value="All in one" delay={900} />
               </View>
             </View>
 
@@ -216,7 +200,7 @@ export default function LoginScreen() {
               {/* Tab switcher */}
               <View style={styles.tabRow}>
                 <Pressable
-                  style={styles.tabItem}
+                  style={[styles.tabItem, isSignIn && styles.tabItemActive]}
                   onPress={() => switchTab("signin")}
                 >
                   <Text
@@ -226,7 +210,7 @@ export default function LoginScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={styles.tabItem}
+                  style={[styles.tabItem, !isSignIn && styles.tabItemActive]}
                   onPress={() => switchTab("signup")}
                 >
                   <Text
@@ -238,25 +222,6 @@ export default function LoginScreen() {
                     Sign Up
                   </Text>
                 </Pressable>
-              </View>
-
-              {/* Static underline with active half highlight */}
-              <View style={styles.tabUnderline}>
-                <Animated.View
-                  style={[
-                    styles.tabUnderlineActive,
-                    {
-                      transform: [
-                        {
-                          translateX: tabSlide.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: ["0%", "100%"] as any,
-                          }),
-                        },
-                      ],
-                    },
-                  ]}
-                />
               </View>
 
               <View style={styles.form}>

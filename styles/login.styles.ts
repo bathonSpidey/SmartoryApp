@@ -1,16 +1,20 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
-const T = {
-  bg: "#061a18",
-  bgCard: "#0c2825",
+// ── Design tokens (dark palette) ──────────────────────────────
+export const T = {
+  bg: "#050f0e", // page background
+  bgCard: "#0b211f", // card surface
+  bgInput: "#06171500", // transparent, inherits card
+  bgInputFill: "#071c1a", // solid input bg
   teal: "#14b8a6",
   tealDim: "#0d9488",
-  tealGlow: "#14b8a620",
-  tealBorder: "#14b8a630",
+  tealDeep: "#065f59",
+  tealGlow: "#14b8a614",
+  tealBorder: "#14b8a625",
   tealBorderFocus: "#14b8a6",
-  text: "#e2f4f2",
-  textMuted: "#7ab8b2",
-  textDim: "#4b7b78",
+  text: "#dff0ed",
+  textMuted: "#6ea8a2",
+  textDim: "#3d706a",
   amber: "#f59e0b",
   white: "#ffffff",
 };
@@ -28,16 +32,16 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 24,
-    paddingVertical: 32,
-    gap: 28,
-    maxWidth: 460,
+    paddingVertical: 40,
+    gap: 32,
+    maxWidth: 440,
     width: "100%",
     alignSelf: "center",
   },
 
   // ── Brand section ─────────────────────────
   brandSection: {
-    gap: 14,
+    gap: 12,
   },
   logoRow: {
     flexDirection: "row",
@@ -46,85 +50,97 @@ export const styles = StyleSheet.create({
   },
   logoText: {
     color: T.text,
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
   tagline: {
     color: T.text,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "800",
-    letterSpacing: -1,
-    lineHeight: 34,
+    letterSpacing: -1.2,
+    lineHeight: 36,
+  },
+  taglineAccent: {
+    color: T.teal,
   },
   statsRow: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
     flexWrap: "wrap",
+    marginTop: 2,
   },
   statPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: T.tealBorder,
     backgroundColor: T.tealGlow,
+    flexDirection: "row",
     alignItems: "center",
+    gap: 5,
   },
   statValue: {
     color: T.teal,
-    fontSize: 13,
-    fontWeight: "700",
-    letterSpacing: -0.3,
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: -0.2,
   },
   statLabel: {
     color: T.textDim,
-    fontSize: 10,
-    letterSpacing: 0.3,
-    marginTop: 1,
+    fontSize: 12,
+    letterSpacing: 0,
   },
 
   // ── Card ──────────────────────────────────
   card: {
     backgroundColor: T.bgCard,
-    borderRadius: 20,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: T.tealBorder,
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 28,
+    paddingHorizontal: 28,
+    paddingTop: 24,
+    paddingBottom: 32,
     shadowColor: T.teal,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 32,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
     elevation: 8,
   },
 
   // ── Tabs ──────────────────────────────────
   tabRow: {
     flexDirection: "row",
-    marginBottom: 0,
+    backgroundColor: "#06100f",
+    borderRadius: 10,
+    padding: 4,
+    marginBottom: 24,
   },
   tabItem: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 9,
+    borderRadius: 7,
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
+  },
+  tabItemActive: {
+    backgroundColor: T.tealDeep,
   },
   tabLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
     color: T.textDim,
-    letterSpacing: -0.2,
+    letterSpacing: -0.1,
   },
   tabLabelActive: {
     color: T.text,
     fontWeight: "700",
   },
+  // Kept for Animated.View ref compatibility — visually hidden
   tabUnderline: {
-    height: 2,
-    backgroundColor: T.tealBorder,
-    borderRadius: 1,
-    marginBottom: 22,
+    height: 0,
+    marginBottom: 0,
     overflow: "hidden",
   },
   tabUnderlineActive: {
@@ -137,10 +153,10 @@ export const styles = StyleSheet.create({
 
   // ── Form ──────────────────────────────────
   form: {
-    gap: 14,
+    gap: 16,
   },
   fieldGroup: {
-    gap: 6,
+    gap: 7,
   },
   fieldLabelRow: {
     flexDirection: "row",
@@ -151,37 +167,38 @@ export const styles = StyleSheet.create({
     color: T.textMuted,
     fontSize: 11,
     fontWeight: "600",
-    letterSpacing: 0.8,
+    letterSpacing: 0.7,
     textTransform: "uppercase",
   },
   forgotLink: {
     color: T.teal,
     fontSize: 12,
     fontWeight: "600",
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
   },
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#07201e",
-    borderRadius: 12,
+    backgroundColor: "#071c1a",
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: T.tealBorder,
     paddingHorizontal: 14,
-    height: 50,
+    height: 48,
     gap: 10,
   },
   inputWrapFocused: {
     borderColor: T.tealBorderFocus,
-    backgroundColor: "#0a2926",
+    backgroundColor: "#09211f",
     shadowColor: T.teal,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
     elevation: 3,
   },
   inputIcon: {
     color: T.textDim,
-    fontSize: 13,
+    fontSize: 12,
     width: 16,
     textAlign: "center",
   },
@@ -190,34 +207,36 @@ export const styles = StyleSheet.create({
     color: T.text,
     fontSize: 15,
     height: "100%",
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
   },
 
   // ── Button ────────────────────────────────
   button: {
     backgroundColor: T.teal,
-    borderRadius: 14,
-    height: 52,
+    borderRadius: 10,
+    height: 50,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 2,
+    marginTop: 4,
     gap: 8,
     shadowColor: T.teal,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
     elevation: 6,
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
   },
   buttonText: {
     color: T.bg,
     fontSize: 15,
-    fontWeight: "800",
-    letterSpacing: -0.3,
+    fontWeight: "700",
+    letterSpacing: -0.2,
   },
   buttonArrow: {
     color: T.bg,
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "600",
   },
 
   // ── Divider ───────────────────────────────
@@ -229,42 +248,26 @@ export const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#14b8a620",
+    backgroundColor: T.tealBorder,
   },
   dividerText: {
     color: T.textDim,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
     letterSpacing: 0.5,
+    textTransform: "uppercase",
   },
 
-  // ── Grid overlay ──────────────────────────
-  gridOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.04,
-  },
-
-  // ── Legacy (kept for StatPill/ComingSoonModal) ──
-  cardTitle: {
-    color: T.text,
-    fontSize: 22,
-    fontWeight: "700",
-    letterSpacing: -0.5,
-  },
-  cardSubtitle: {
-    color: T.textMuted,
-    fontSize: 14,
-    marginBottom: 16,
-    marginTop: 2,
-  },
-  signupHint: {
-    color: T.textDim,
-    fontSize: 13,
+  // ── Form footer (terms/hint) ──────────────
+  formFooter: {
     textAlign: "center",
-    marginTop: 16,
+    color: T.textDim,
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 4,
   },
-  signupLink: {
-    color: T.teal,
+  formFooterLink: {
+    color: T.tealDim,
     fontWeight: "600",
   },
 });

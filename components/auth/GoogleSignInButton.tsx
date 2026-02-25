@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface GoogleSignInButtonProps {
   onPress: () => void;
@@ -35,7 +35,7 @@ export function GoogleSignInButton({
           { transform: [{ scale }], opacity: loading ? 0.6 : 1 },
         ]}
       >
-        {/* Google "G" logo built from Views — no image needed */}
+        {/* Google "G" — no image dependency */}
         <View style={s.gLogo}>
           <Text style={s.gText}>G</Text>
         </View>
@@ -52,31 +52,32 @@ const s = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    height: 52,
-    borderRadius: 14,
+    height: 50,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#14b8a630",
-    backgroundColor: "#0c2825",
+    borderColor: "#14b8a625",
+    backgroundColor: "#071c1a",
     gap: 10,
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
   },
   gLogo: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
   },
   gText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "800",
-    color: "#4285F4", // Google blue
-    letterSpacing: -0.3,
+    color: "#4285F4",
+    letterSpacing: -0.2,
   },
   label: {
-    color: "#e2f4f2",
-    fontSize: 15,
+    color: "#dff0ed",
+    fontSize: 14,
     fontWeight: "600",
-    letterSpacing: -0.2,
+    letterSpacing: -0.1,
   },
 });

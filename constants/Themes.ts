@@ -341,3 +341,57 @@ export const StockStatus = {
     background: Colors.slate100,
   },
 };
+
+// ─────────────────────────────────────────────
+//  Dark Theme  (app-wide semantic tokens)
+//  Use these for dark-mode screens so each
+//  screen never hard-codes hex values.
+// ─────────────────────────────────────────────
+
+export const ThemeDark = {
+  // ── Surfaces ─────────────────────────────
+  background: "#050f0e", // page / screen
+  surface: "#0b211f", // card, sheet
+  surfaceInput: "#071c1a", // input field
+  surfaceHover: "#09211f", // focused input / hovered item
+  surfaceSubtle: "#06100f", // pill background, tab track
+
+  // ── Borders ──────────────────────────────
+  border: "#14b8a625", // default border
+  borderFocus: "#14b8a6", // focused border
+  borderStrong: "#14b8a640", // dividers, strong rule
+
+  // ── Brand ────────────────────────────────
+  primary: "#14b8a6", // teal-500
+  primaryDim: "#0d9488", // teal-600
+  primaryDeep: "#065f59", // teal-900 (active tab bg)
+  primaryGlow: "#14b8a614", // glow / pill fill
+
+  // ── Text ─────────────────────────────────
+  text: "#dff0ed", // primary body
+  textMuted: "#6ea8a2", // labels, captions
+  textDim: "#3d706a", // placeholder, disabled
+  textInverse: "#050f0e", // on primary button
+
+  // ── Semantic ─────────────────────────────
+  success: "#10b981",
+  warning: "#f59e0b",
+  error: "#ef4444",
+  info: "#3b82f6",
+
+  // ── Shadow ───────────────────────────────
+  shadowPrimary: {
+    shadowColor: "#14b8a6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+  shadowCard: {
+    shadowColor: "#14b8a6",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.1,
+    shadowRadius: 40,
+    elevation: 8,
+  },
+};
