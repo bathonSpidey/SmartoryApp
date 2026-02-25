@@ -49,8 +49,17 @@ export function ReceiptCard({
   const date = relativeDate(receipt.raw_response.date ?? receipt.created_at);
   const storeInitial = receipt.store_name.trim()[0]?.toUpperCase() ?? "?";
 
-  // Unique categories used in this receipt
+  // Unique categories + per-category spend totals
   const uniqueCategories = [...new Set(receipt.items.map((i) => i.category))];
+  const categoryTotals = uniqueCategories.reduce<Record<string, number>>(
+    (acc, cat) => {
+      acc[cat] = receipt.items
+        .filter((i) => i.category === cat)
+        .reduce((sum, i) => sum + i.price * (i.quantity ?? 1), 0);
+      return acc;
+    },
+    {},
+  );
 
   function toggle() {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -143,7 +152,13 @@ export function ReceiptCard({
             contentContainerStyle={styles.chipsScroll}
           >
             {uniqueCategories.map((cat) => (
-              <CategoryChip key={cat} category={cat} size="sm" />
+              <CategoryChip
+                key={cat}
+                category={cat}
+                size="sm"
+                amount={categoryTotals[cat]}
+                symbol={symbol}
+              />
             ))}
           </ScrollView>
           <View

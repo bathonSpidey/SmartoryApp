@@ -85,7 +85,7 @@ function applySort(
   });
 }
 
-type Section = { label: string; data: Receipt[]; isOlder?: boolean };
+type Section = { label: string; data: Receipt[]; isOlder?: boolean; isSortable?: boolean };
 
 function groupByRecency(receipts: Receipt[]): Section[] {
   const now = new Date();
@@ -98,8 +98,8 @@ function groupByRecency(receipts: Receipt[]): Section[] {
 
   const sections: Section[] = [
     { label: "This Week", data: [] },
-    { label: "Earlier This Month", data: [] },
-    { label: "Older", data: [], isOlder: true },
+    { label: "Earlier This Month", data: [], isSortable: true },
+    { label: "Older", data: [], isOlder: true, isSortable: true },
   ];
 
   for (const r of receipts) {
@@ -192,7 +192,7 @@ export default function InventoryScreen() {
             <>
               <InventorySummary receipts={receipts} theme={theme} />
               {groupByRecency(receipts).map((section) => {
-                const data = section.isOlder
+                const data = section.isSortable
                   ? applySort(section.data, sortOption.field, sortOption.dir)
                   : section.data;
                 return (
@@ -204,7 +204,7 @@ export default function InventoryScreen() {
                       >
                         {section.label}
                       </Text>
-                      {section.isOlder && (
+                      {section.isSortable && (
                         <Pressable
                           style={[
                             s.sortBtn,
