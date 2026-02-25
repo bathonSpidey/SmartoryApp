@@ -1,4 +1,4 @@
-import { Colors, Radius, Typography } from "@/constants/Themes";
+import { Radius, Typography } from "@/constants/Themes";
 import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
@@ -94,7 +94,7 @@ export default function Navbar({ state, navigation }: BottomTabBarProps) {
                     backgroundColor: isFocused
                       ? theme.primaryDim
                       : theme.primary,
-                    shadowColor: theme.primary,
+                    boxShadow: `0px 4px 12px ${theme.primary}72`,
                   },
                 ]}
               >
@@ -146,13 +146,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: 10,
     ...Platform.select({
-      ios: {
-        shadowColor: Colors.ink,
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
-      },
       android: { elevation: 12 },
+      default: { boxShadow: "0px -4px 16px rgba(28,20,16,0.12)" },
     }),
   },
   tab: {
@@ -188,9 +183,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: -20,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
     elevation: 8,
   },
 });

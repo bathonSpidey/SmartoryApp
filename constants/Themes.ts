@@ -51,17 +51,11 @@ export type SemanticTheme = {
 
   // ── Shadows ──────────────────────────────
   shadowCard: {
-    shadowColor: string;
-    shadowOffset: { width: number; height: number };
-    shadowOpacity: number;
-    shadowRadius: number;
+    boxShadow: string;
     elevation: number;
   };
   shadowPrimary: {
-    shadowColor: string;
-    shadowOffset: { width: number; height: number };
-    shadowOpacity: number;
-    shadowRadius: number;
+    boxShadow: string;
     elevation: number;
   };
 };
@@ -112,17 +106,11 @@ export const ThemeLight: SemanticTheme = {
 
   // ── Shadows ──────────────────────────────
   shadowCard: {
-    shadowColor: "#7c6f5a",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
+    boxShadow: "0px 3px 16px rgba(124,111,90,0.08)",
     elevation: 4,
   },
   shadowPrimary: {
-    shadowColor: "#0d9488",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 16,
+    boxShadow: "0px 4px 16px rgba(13,148,136,0.2)",
     elevation: 5,
   },
 };
@@ -172,17 +160,11 @@ export const ThemeDark: SemanticTheme = {
 
   // ── Shadows ──────────────────────────────
   shadowCard: {
-    shadowColor: "#14b8a6",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 32,
+    boxShadow: "0px 8px 32px rgba(20,184,166,0.12)",
     elevation: 8,
   },
   shadowPrimary: {
-    shadowColor: "#14b8a6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
+    boxShadow: "0px 4px 20px rgba(20,184,166,0.3)",
     elevation: 6,
   },
 };

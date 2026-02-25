@@ -1,3 +1,4 @@
+import AgentConfigModal from "@/components/agents/AgentConfigModal";
 import AgentsGrid from "@/components/agents/AgentsGrid";
 import { AgentConfig } from "@/components/agents/types";
 import { Radius, Spacing, Typography } from "@/constants/Themes";
@@ -5,6 +6,7 @@ import { useSession } from "@/hooks/useSession";
 import { useTheme } from "@/hooks/useTheme";
 import {
   AGENT_META,
+  AgentType,
   ALL_AGENT_TYPES,
   fetchAgentConfigs,
 } from "@/lib/agents.service";
@@ -35,6 +37,13 @@ export default function AgentsScreen() {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [refreshing, setRefreshing] = useState(false);
 
+  // ── Modal state ──
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalAgentType, setModalAgentType] = useState<AgentType>("extractor");
+  const [modalInitialConfig, setModalInitialConfig] = useState<
+    AgentConfig | undefined
+  >(undefined);
+
   const loadConfigs = useCallback(
     async (silent = false) => {
       if (!session?.access_token) return;
@@ -62,13 +71,21 @@ export default function AgentsScreen() {
     setRefreshing(false);
   }, [loadConfigs]);
 
-  const handleConfigure = useCallback((agentType: string) => {
-    console.log("[Agents] Configure pressed →", agentType);
+  const openModal = useCallback((agentType: string, config?: AgentConfig) => {
+    setModalAgentType(agentType as AgentType);
+    setModalInitialConfig(config);
+    setModalVisible(true);
   }, []);
 
-  const handleUpdate = useCallback((agentType: string, config: AgentConfig) => {
-    console.log("[Agents] Update pressed →", agentType, config);
-  }, []);
+  const handleConfigure = useCallback(
+    (agentType: string) => openModal(agentType),
+    [openModal],
+  );
+
+  const handleUpdate = useCallback(
+    (agentType: string, config: AgentConfig) => openModal(agentType, config),
+    [openModal],
+  );
 
   // Build grid items from canonical type list
   const gridItems = ALL_AGENT_TYPES.map((type) => ({
@@ -86,6 +103,21 @@ export default function AgentsScreen() {
         { paddingTop: insets.top, backgroundColor: theme.background },
       ]}
     >
+      {/* ── Config Modal ── */}
+      {session?.access_token && (
+        <AgentConfigModal
+          visible={modalVisible}
+          agentType={modalAgentType}
+          initialConfig={modalInitialConfig}
+          token={session.access_token}
+          theme={theme}
+          onClose={() => setModalVisible(false)}
+          onSaved={() => {
+            setModalVisible(false);
+            loadConfigs(true);
+          }}
+        />
+      )}
       {/* ── Header ── */}
       <View
         style={[

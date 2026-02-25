@@ -88,9 +88,9 @@ function GlowOrb({
 
   return (
     <Animated.View
-      pointerEvents="none"
       style={{
         position: "absolute",
+        pointerEvents: "none",
         left: x as any,
         top: y as any,
         width: size,
@@ -116,7 +116,7 @@ function GlowOrb({
 
 export function AmbientBackground() {
   return (
-    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFillObject, { pointerEvents: "none" }]}>
       {ORBS.map((orb, i) => (
         <GlowOrb key={i} {...orb} />
       ))}
