@@ -23,6 +23,12 @@ const NAV_ITEMS: NavItem[] = [
     iconFocused: "cube",
   },
   {
+    route: "reports",
+    label: "Reports",
+    icon: "bar-chart-outline",
+    iconFocused: "bar-chart",
+  },
+  {
     route: "scan",
     label: "Scan",
     icon: "scan-outline",
@@ -30,16 +36,16 @@ const NAV_ITEMS: NavItem[] = [
     isScan: true,
   },
   {
-    route: "reports",
-    label: "Reports",
-    icon: "bar-chart-outline",
-    iconFocused: "bar-chart",
-  },
-  {
     route: "agents",
     label: "Agents",
     icon: "hardware-chip-outline",
     iconFocused: "hardware-chip",
+  },
+  {
+    route: "preferences",
+    label: "Preferences",
+    icon: "sparkles-outline",
+    iconFocused: "sparkles",
   },
   {
     route: "profile",

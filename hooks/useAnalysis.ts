@@ -6,6 +6,7 @@ import {
   getUrgentItems,
   ItemDetail,
 } from "@/lib/analysis.service";
+import { createPreference } from "@/lib/preference.service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "./useSession";
@@ -138,14 +139,25 @@ export function useAnalysis(): UseAnalysisResult {
     pickQuestion,
   ]);
 
-  // ── Answer (same effect as dismiss — records choice) ──
+  // ── Answer — POST to backend then dismiss locally ────
 
   const answerCurrentQuestion = useCallback(
-    async (_option: string) => {
-      // TODO: POST answer to backend once endpoint exists
+    async (option: string) => {
+      if (currentQuestion && session?.access_token) {
+        try {
+          await createPreference(
+            session.access_token,
+            currentQuestion.question,
+            option,
+          );
+        } catch (e) {
+          // Non-fatal: log but still dismiss the card
+          console.warn("[useAnalysis] Failed to save preference:", e);
+        }
+      }
       await dismissCurrentQuestion();
     },
-    [dismissCurrentQuestion],
+    [currentQuestion, session?.access_token, dismissCurrentQuestion],
   );
 
   // ── Derived values ────────────────────────────

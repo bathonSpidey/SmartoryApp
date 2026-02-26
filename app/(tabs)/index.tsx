@@ -25,6 +25,13 @@ export default function HomeScreen() {
   } = useAnalysis();
 
   const [notifSheetOpen, setNotifSheetOpen] = useState(false);
+  const [seenAlertCount, setSeenAlertCount] = useState(0);
+  const unseenCount = Math.max(0, allAlerts.length - seenAlertCount);
+
+  function openNotifSheet() {
+    setSeenAlertCount(allAlerts.length);
+    setNotifSheetOpen(true);
+  }
 
   return (
     <>
@@ -35,8 +42,8 @@ export default function HomeScreen() {
       >
         <HomeHeader
           userEmail={userEmail}
-          notificationCount={allAlerts.length}
-          onNotificationPress={() => setNotifSheetOpen(true)}
+          notificationCount={unseenCount}
+          onNotificationPress={openNotifSheet}
         />
 
         {/* Urgent expiry strip — only items ≤ 2 days */}
