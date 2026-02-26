@@ -366,9 +366,9 @@ function relativeDate(raw: string): string {
     (todayStart.getTime() - dateStart.getTime()) / 86_400_000,
   );
 
-  if (diffDays === 0) return "Today";
+  if (diffDays <= 0) return "Today";
   if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays <= 7) return `${diffDays} days ago`;
   if (diffDays < 14) return "Last week";
 
   // Older: show "Jan 5" or "Jan 5, 2023" if different year
