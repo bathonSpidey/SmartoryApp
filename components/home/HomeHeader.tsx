@@ -9,11 +9,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   userEmail?: string;
   notificationCount?: number;
+  onNotificationPress?: () => void;
 };
 
 export default function HomeHeader({
   userEmail = "",
   notificationCount = 3,
+  onNotificationPress,
 }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -65,6 +67,7 @@ export default function HomeHeader({
           {/* Notifications */}
           <Pressable
             style={[styles.iconButton, { backgroundColor: theme.background }]}
+            onPress={onNotificationPress}
           >
             <Ionicons
               name="notifications-outline"

@@ -61,110 +61,109 @@ export type SemanticTheme = {
 };
 
 // ─────────────────────────────────────────────
-//  Light Theme  — "Warm Pantry"
-//  Cream whites + warm stone neutrals.
-//  Feels like a tidy kitchen notepad, not a
-//  cold enterprise dashboard.
+//  Light Theme  — "Night Owl Light"
+//  Soft off-whites + cool blue-grey neutrals.
+//  Based on Sarah Drasner's Night Owl Light.
 // ─────────────────────────────────────────────
 
 export const ThemeLight: SemanticTheme = {
   // ── Surfaces ─────────────────────────────
-  background: "#faf8f5", // warm cream — linen / paper
-  surface: "#ffffff",
-  surfaceElevated: "#f5f2ec",
-  surfaceInput: "#f2efe9",
-  surfaceHover: "#ede9e2",
-  surfaceSubtle: "#f7f4ef",
+  background: "#fbfbfb", // editor.background
+  surface: "#f6f6f6", // tab.activeBackground
+  surfaceElevated: "#f0f0f0", // activityBar / sideBar
+  surfaceInput: "#f0f0f0", // input.background
+  surfaceHover: "#d3e8f8", // list.hoverBackground
+  surfaceSubtle: "#f0f0f0",
 
   // ── Borders ──────────────────────────────
-  border: "#e5dfd5", // warm beige divider
-  borderFocus: "#0d9488",
-  borderStrong: "#cec8be",
+  border: "#d9d9d9", // widget.shadow / dropdown.border
+  borderFocus: "#2aa298", // inputOption.activeBorder
+  borderStrong: "#cccccc", // scrollbar.shadow
 
   // ── Brand ────────────────────────────────
-  primary: "#0d9488",
-  primaryDim: "#0f766e",
-  primaryDeep: "#e6faf8", // light teal tint for avatar bg, chips
-  primaryGlow: "#0d948814",
-  primaryText: "#0d9488",
+  primary: "#2aa298", // button.background / badge
+  primaryDim: "#08916a", // terminal.ansiGreen (darker teal)
+  primaryDeep: "#d3e8f8", // list.activeSelectionBackground
+  primaryGlow: "#2aa29814",
+  primaryText: "#2aa298",
 
   // ── Text ─────────────────────────────────
-  text: "#1c1410", // warm near-black (stone, not cold slate)
-  textMuted: "#7c7168", // warm mid-brown
-  textDim: "#a89f97", // warm light — placeholder, disabled
-  textInverse: "#ffffff",
+  text: "#403f53", // foreground
+  textMuted: "#93a1a1", // input.placeholderForeground
+  textDim: "#90a7b2", // editorCursor / editorLineNumber
+  textInverse: "#f0f0f0",
 
   // ── Semantic ─────────────────────────────
-  success: "#059669",
-  successBg: "#ecfdf5",
-  warning: "#d97706",
-  warningBg: "#fffbeb",
-  error: "#dc2626",
-  errorBg: "#fef2f2",
-  info: "#2563eb",
-  infoBg: "#eff6ff",
+  success: "#08916a",
+  successBg: "#08916a14",
+  warning: "#daaa01",
+  warningBg: "#daaa0114",
+  error: "#de3d3b",
+  errorBg: "#de3d3b14",
+  info: "#288ed7",
+  infoBg: "#288ed714",
 
   // ── Shadows ──────────────────────────────
   shadowCard: {
-    boxShadow: "0px 3px 16px rgba(124,111,90,0.08)",
+    boxShadow: "0px 3px 16px rgba(64,63,83,0.08)",
     elevation: 4,
   },
   shadowPrimary: {
-    boxShadow: "0px 4px 16px rgba(13,148,136,0.2)",
+    boxShadow: "0px 4px 16px rgba(42,162,152,0.22)",
     elevation: 5,
   },
 };
 
 // ─────────────────────────────────────────────
-//  Dark Theme  — "Deep Forest Kitchen"
-//  Warm deep teal-greens — not cold blue-black.
-//  Feels like a premium smart-home UI at night.
+//  Dark Theme  — "Night Owl"
+//  Deep navy-blue + cyan — Sarah Drasner's
+//  iconic Night Owl VS Code theme.
 // ─────────────────────────────────────────────
 
 export const ThemeDark: SemanticTheme = {
   // ── Surfaces ─────────────────────────────
-  background: "#0c1a16",
-  surface: "#112620",
-  surfaceElevated: "#162e27",
-  surfaceInput: "#0e221d",
-  surfaceHover: "#1a3229",
-  surfaceSubtle: "#0e1f1b",
+  background: "#011627", // editor.background
+  surface: "#0b2942", // tab.activeBackground
+  surfaceElevated: "#0e293f", // list.inactiveSelectionBackground
+  surfaceInput: "#0b253a", // input.background
+  surfaceHover: "#1d3b53", // editor.selectionBackground
+  surfaceSubtle: "#010d18", // list.focusBackground
 
   // ── Borders ──────────────────────────────
-  border: "#1e3f38",
-  borderFocus: "#14b8a6",
-  borderStrong: "#2a5248",
+  border: "#122d42", // contrastBorder / focusBorder
+  borderFocus: "#7fdbca", // terminal.ansiBrightCyan
+  borderStrong: "#1d3b53", // editor.selectionBackground
 
   // ── Brand ────────────────────────────────
-  primary: "#14b8a6",
-  primaryDim: "#0d9488",
-  primaryDeep: "#073d37",
-  primaryGlow: "#14b8a614",
-  primaryText: "#14b8a6",
+  primary: "#7fdbca", // terminal.ansiBrightCyan
+  primaryDim: "#21c7a8", // terminal.ansiCyan
+  primaryDeep: "#0b2942", // tab.activeBackground
+  primaryGlow: "#7fdbca18",
+  primaryText: "#7fdbca",
 
   // ── Text ─────────────────────────────────
-  text: "#e8f5f2",
-  textMuted: "#6fa89e",
-  textDim: "#3d7269",
-  textInverse: "#0c1a16",
+  text: "#d6deeb", // editor.foreground
+  textMuted: "#5f7e97", // sideBarTitle / status bar
+  textDim: "#4b6479", // editorLineNumber.foreground
+  textInverse: "#011627",
 
   // ── Semantic ─────────────────────────────
-  success: "#10b981",
-  successBg: "#10b98118",
-  warning: "#f59e0b",
-  warningBg: "#f59e0b18",
-  error: "#ef4444",
-  errorBg: "#ef444418",
-  info: "#3b82f6",
-  infoBg: "#3b82f618",
+  success: "#22da6e", // terminal.ansiGreen
+  successBg: "#22da6e18",
+  warning: "#ffca28", // inputValidation.warningBorder
+  warningBg: "#ffca2818",
+  error: "#ef5350", // errorForeground
+  errorBg: "#ef535018",
+  info: "#82aaff", // terminal.ansiBlue
+  infoBg: "#82aaff18",
 
   // ── Shadows ──────────────────────────────
   shadowCard: {
-    boxShadow: "0px 8px 32px rgba(20,184,166,0.12)",
+    boxShadow: "0px 8px 32px rgba(1,22,39,0.6)",
     elevation: 8,
   },
   shadowPrimary: {
-    boxShadow: "0px 4px 20px rgba(20,184,166,0.3)",
+    boxShadow: "0px 4px 20px rgba(127,219,202,0.25)",
     elevation: 6,
   },
 };
