@@ -5,7 +5,7 @@
 //  across all users and cannot be modified or deleted.
 // ─────────────────────────────────────────────
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL!;
 
 // ─── Types ────────────────────────────────────
 

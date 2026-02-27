@@ -3,7 +3,7 @@
 //  Manages user-level preferences via the API.
 // ─────────────────────────────────────────────
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL!;
 
 import { CurrencyCode } from "@/constants/currencies";
 export type { CurrencyCode };

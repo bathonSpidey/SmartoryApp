@@ -4,7 +4,7 @@
 //  from the /analysis/today endpoint.
 // ─────────────────────────────────────────────
 
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL!;
 
 // ─── Types ────────────────────────────────────
 
@@ -120,7 +120,8 @@ export function flattenQuestions(entry: AnalysisEntry): FlatQuestion[] {
 export async function fetchTodaysAnalysis(
   accessToken: string,
 ): Promise<AnalysisEntry | null> {
-  const res = await fetch(`${BASE_URL}/analysis/today`, {
+  const url = `${BASE_URL}/analysis/today`;
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       accept: "application/json",
@@ -129,11 +130,11 @@ export async function fetchTodaysAnalysis(
   });
 
   if (!res.ok) {
+    const errorBody = await res.text();
+    console.error("[fetchTodaysAnalysis] Error body:", errorBody);
     throw new Error(`Analysis fetch failed: ${res.status}`);
   }
-
   const json: AnalysisResponse = await res.json();
-
   if (json.status !== "success" || !json.data?.length) return null;
   return json.data[0];
 }
