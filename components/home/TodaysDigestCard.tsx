@@ -148,10 +148,7 @@ const styles = StyleSheet.create({
     backgroundColor: CARD_BG,
     borderRadius: Radius.xl,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.28,
-    shadowRadius: 20,
+    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.28)",
     elevation: 10,
   },
   accentBar: {

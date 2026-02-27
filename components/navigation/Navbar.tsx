@@ -24,9 +24,9 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     route: "reports",
-    label: "Reports",
-    icon: "bar-chart-outline",
-    iconFocused: "bar-chart",
+    label: "Plan",
+    icon: "cart-outline",
+    iconFocused: "cart",
   },
   {
     route: "scan",

@@ -187,6 +187,16 @@ function BudgetIcon({ color, size }: { color: string; size: number }) {
   );
 }
 
+/** Appends an alpha value to a hex colour string (strips existing alpha first). */
+function withAlpha(color: string, opacity: number): string {
+  const hex = Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, "0");
+  const base =
+    color.startsWith("#") && color.length === 9 ? color.slice(0, 7) : color;
+  return `${base}${hex}`;
+}
+
 // ─── Main component ────────────────────────────
 export default function BotFace({
   agentType,
@@ -219,10 +229,7 @@ export default function BotFace({
         borderWidth: active ? 2 : 1.5,
         alignItems: "center",
         justifyContent: "center",
-        shadowColor: active ? accent : headBorder,
-        shadowOpacity: active ? 0.2 : 0.08,
-        shadowRadius: active ? 5 : 2,
-        shadowOffset: { width: 0, height: 2 },
+        boxShadow: `0px 2px ${active ? 5 : 2}px ${withAlpha(active ? accent : headBorder, active ? 0.2 : 0.08)}`,
       }}
     >
       <IconComponent color={iconColor} size={iconSize} />
