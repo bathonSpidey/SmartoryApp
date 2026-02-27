@@ -53,3 +53,96 @@ export async function fetchIncompleteOrders(
 
   return response.json() as Promise<IncompleteOrdersResponse>;
 }
+
+// ─── Add item to order ────────────────────────
+
+export type AddItemResponse = {
+  status: "success" | "error";
+  data: Order;
+};
+
+/**
+ * Manually adds a single item by name to an existing order plan.
+ */
+export async function addItemToOrder(
+  token: string,
+  orderId: string,
+  itemName: string,
+): Promise<AddItemResponse> {
+  const response = await fetch(`${BASE_URL}/orders/${orderId}/items`, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ item_name: itemName }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Failed to add item: HTTP ${response.status}${text ? ` — ${text}` : ""}`,
+    );
+  }
+
+  return response.json() as Promise<AddItemResponse>;
+}
+
+// ─── Mark order complete / incomplete ──────────────────────
+
+/**
+ * Marks an order plan as complete (or incomplete).
+ */
+export async function completePlan(
+  token: string,
+  orderId: string,
+  isComplete = true,
+): Promise<AddItemResponse> {
+  const response = await fetch(`${BASE_URL}/orders/${orderId}`, {
+    method: "PATCH",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ is_complete: isComplete }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Failed to complete order: HTTP ${response.status}${text ? ` — ${text}` : ""}`,
+    );
+  }
+
+  return response.json() as Promise<AddItemResponse>;
+}
+
+/**
+ * Toggles have_ordered for an item by name inside an order plan.
+ */
+export async function togglePlanItem(
+  token: string,
+  orderId: string,
+  itemName: string,
+): Promise<AddItemResponse> {
+  const response = await fetch(`${BASE_URL}/orders/${orderId}/items`, {
+    method: "PATCH",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ item_name: itemName }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(
+      `Failed to toggle item: HTTP ${response.status}${text ? ` — ${text}` : ""}`,
+    );
+  }
+
+  return response.json() as Promise<AddItemResponse>;
+}
