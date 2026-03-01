@@ -297,6 +297,8 @@ export default function LoginScreen() {
                       onChangeText={setEmail}
                       autoCapitalize="none"
                       keyboardType="email-address"
+                      autoComplete="off"
+                      importantForAutofill="no"
                       onFocus={() => {
                         console.log("[Login] email → FOCUSED");
                         setEmailFocused(true);
@@ -334,6 +336,8 @@ export default function LoginScreen() {
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={!showPassword}
+                      autoComplete="off"
+                      importantForAutofill="no"
                       onFocus={() => {
                         console.log("[Login] password → FOCUSED");
                         setPassFocused(true);
@@ -380,6 +384,8 @@ export default function LoginScreen() {
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={!showConfirmPassword}
+                        autoComplete="off"
+                        importantForAutofill="no"
                         onFocus={() => {
                           console.log("[Login] confirmPassword → FOCUSED");
                           setConfirmFocused(true);
