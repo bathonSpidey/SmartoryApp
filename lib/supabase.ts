@@ -6,6 +6,7 @@ import { Platform } from "react-native";
 const SUPABASE_URL = Constants.expoConfig?.extra?.supabaseUrl;
 const SUPABASE_ANON_KEY = Constants.expoConfig?.extra?.supabaseAnonKey;
 
+
 // Professional teams use a "Shaped" storage object
 const customStorage = {
   getItem: (key: string) => AsyncStorage.getItem(key),
