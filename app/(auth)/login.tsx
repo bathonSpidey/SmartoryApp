@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
@@ -159,127 +158,156 @@ export default function LoginScreen() {
       <AmbientBackground />
 
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            style={{ flex: 1 }}
-          >
-            <View style={styles.scrollContent}>
-              {/* ── Brand ── */}
-              <View style={styles.brandSection}>
-                <View style={styles.logoRow}>
-                  <IsoCube size={42} />
-                  <Text style={styles.logoText}>Smartory</Text>
-                </View>
-                <Text style={styles.tagline}>Inventory,{"\n"}simplified.</Text>
-                <View style={styles.statsRow}>
-                  <StatPill
-                    label="Real-time updates"
-                    value="Live Stock"
-                    delay={500}
-                  />
-                  <StatPill
-                    label="Low inventory"
-                    value="Smart Alerts"
-                    delay={700}
-                  />
-                  <StatPill
-                    label="Multi-location"
-                    value="All in one"
-                    delay={900}
-                  />
-                </View>
+          <View style={styles.scrollContent}>
+            {/* ── Brand ── */}
+            <View style={styles.brandSection}>
+              <View style={styles.logoRow}>
+                <IsoCube size={42} />
+                <Text style={styles.logoText}>Smartory</Text>
+              </View>
+              <Text style={styles.tagline}>Inventory,{"\n"}simplified.</Text>
+              <View style={styles.statsRow}>
+                <StatPill
+                  label="Real-time updates"
+                  value="Live Stock"
+                  delay={500}
+                />
+                <StatPill
+                  label="Low inventory"
+                  value="Smart Alerts"
+                  delay={700}
+                />
+                <StatPill
+                  label="Multi-location"
+                  value="All in one"
+                  delay={900}
+                />
+              </View>
+            </View>
+
+            {/* ── Card ── */}
+            <Animated.View
+              style={[
+                styles.card,
+                {
+                  opacity: cardAnim,
+                  transform: [
+                    {
+                      translateY: cardAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [40, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              {/* Tab switcher */}
+              <View style={styles.tabRow}>
+                <Pressable
+                  style={[styles.tabItem, isSignIn && styles.tabItemActive]}
+                  onPress={() => switchTab("signin")}
+                >
+                  <Text
+                    style={[styles.tabLabel, isSignIn && styles.tabLabelActive]}
+                  >
+                    Sign In
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.tabItem, !isSignIn && styles.tabItemActive]}
+                  onPress={() => switchTab("signup")}
+                >
+                  <Text
+                    style={[
+                      styles.tabLabel,
+                      !isSignIn && styles.tabLabelActive,
+                    ]}
+                  >
+                    Sign Up
+                  </Text>
+                </Pressable>
               </View>
 
-              {/* ── Card ── */}
-              <Animated.View
-                style={[
-                  styles.card,
-                  {
-                    opacity: cardAnim,
-                    transform: [
-                      {
-                        translateY: cardAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [40, 0],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                {/* Tab switcher */}
-                <View style={styles.tabRow}>
-                  <Pressable
-                    style={[styles.tabItem, isSignIn && styles.tabItemActive]}
-                    onPress={() => switchTab("signin")}
+              <View style={styles.form}>
+                {/* Email */}
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.fieldLabel}>Email</Text>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      emailFocused && styles.inputWrapFocused,
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.tabLabel,
-                        isSignIn && styles.tabLabelActive,
-                      ]}
-                    >
-                      Sign In
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    style={[styles.tabItem, !isSignIn && styles.tabItemActive]}
-                    onPress={() => switchTab("signup")}
-                  >
-                    <Text
-                      style={[
-                        styles.tabLabel,
-                        !isSignIn && styles.tabLabelActive,
-                      ]}
-                    >
-                      Sign Up
-                    </Text>
-                  </Pressable>
+                    <Text style={styles.inputIcon}>@</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="you@company.com"
+                      placeholderTextColor="#4b7b78"
+                      value={email}
+                      onChangeText={setEmail}
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                    />
+                  </View>
                 </View>
 
-                <View style={styles.form}>
-                  {/* Email */}
-                  <View style={styles.fieldGroup}>
-                    <Text style={styles.fieldLabel}>Email</Text>
-                    <View
-                      style={[
-                        styles.inputWrap,
-                        emailFocused && styles.inputWrapFocused,
-                      ]}
-                    >
-                      <Text style={styles.inputIcon}>@</Text>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="you@company.com"
-                        placeholderTextColor="#4b7b78"
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        onFocus={() => setEmailFocused(true)}
-                        onBlur={() => setEmailFocused(false)}
-                      />
-                    </View>
+                {/* Password */}
+                <View style={styles.fieldGroup}>
+                  <View style={styles.fieldLabelRow}>
+                    <Text style={styles.fieldLabel}>Password</Text>
+                    {isSignIn && <Text style={styles.forgotLink}>Forgot?</Text>}
                   </View>
+                  <View
+                    style={[
+                      styles.inputWrap,
+                      passFocused && styles.inputWrapFocused,
+                    ]}
+                  >
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={15}
+                      color="#3d706a"
+                      style={{ width: 16, textAlign: "center" }}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="••••••••••"
+                      placeholderTextColor="#4b7b78"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      onFocus={() => setPassFocused(true)}
+                      onBlur={() => setPassFocused(false)}
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword((v) => !v)}
+                      style={styles.eyeButton}
+                      hitSlop={8}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye-outline" : "eye-off-outline"}
+                        size={18}
+                        color="#3d706a"
+                      />
+                    </Pressable>
+                  </View>
+                </View>
 
-                  {/* Password */}
+                {/* Confirm Password — Sign Up only */}
+                {!isSignIn && (
                   <View style={styles.fieldGroup}>
-                    <View style={styles.fieldLabelRow}>
-                      <Text style={styles.fieldLabel}>Password</Text>
-                      {isSignIn && (
-                        <Text style={styles.forgotLink}>Forgot?</Text>
-                      )}
-                    </View>
+                    <Text style={styles.fieldLabel}>Confirm Password</Text>
                     <View
                       style={[
                         styles.inputWrap,
-                        passFocused && styles.inputWrapFocused,
+                        confirmFocused && styles.inputWrapFocused,
                       ]}
                     >
                       <Ionicons
@@ -292,20 +320,22 @@ export default function LoginScreen() {
                         style={styles.input}
                         placeholder="••••••••••"
                         placeholderTextColor="#4b7b78"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                        onFocus={() => setPassFocused(true)}
-                        onBlur={() => setPassFocused(false)}
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                        secureTextEntry={!showConfirmPassword}
+                        onFocus={() => setConfirmFocused(true)}
+                        onBlur={() => setConfirmFocused(false)}
                       />
                       <Pressable
-                        onPress={() => setShowPassword((v) => !v)}
+                        onPress={() => setShowConfirmPassword((v) => !v)}
                         style={styles.eyeButton}
                         hitSlop={8}
                       >
                         <Ionicons
                           name={
-                            showPassword ? "eye-outline" : "eye-off-outline"
+                            showConfirmPassword
+                              ? "eye-outline"
+                              : "eye-off-outline"
                           }
                           size={18}
                           color="#3d706a"
@@ -313,98 +343,53 @@ export default function LoginScreen() {
                       </Pressable>
                     </View>
                   </View>
+                )}
 
-                  {/* Confirm Password — Sign Up only */}
-                  {!isSignIn && (
-                    <View style={styles.fieldGroup}>
-                      <Text style={styles.fieldLabel}>Confirm Password</Text>
-                      <View
-                        style={[
-                          styles.inputWrap,
-                          confirmFocused && styles.inputWrapFocused,
-                        ]}
-                      >
-                        <Ionicons
-                          name="lock-closed-outline"
-                          size={15}
-                          color="#3d706a"
-                          style={{ width: 16, textAlign: "center" }}
-                        />
-                        <TextInput
-                          style={styles.input}
-                          placeholder="••••••••••"
-                          placeholderTextColor="#4b7b78"
-                          value={confirmPassword}
-                          onChangeText={setConfirmPassword}
-                          secureTextEntry={!showConfirmPassword}
-                          onFocus={() => setConfirmFocused(true)}
-                          onBlur={() => setConfirmFocused(false)}
-                        />
-                        <Pressable
-                          onPress={() => setShowConfirmPassword((v) => !v)}
-                          style={styles.eyeButton}
-                          hitSlop={8}
-                        >
-                          <Ionicons
-                            name={
-                              showConfirmPassword
-                                ? "eye-outline"
-                                : "eye-off-outline"
-                            }
-                            size={18}
-                            color="#3d706a"
-                          />
-                        </Pressable>
-                      </View>
-                    </View>
-                  )}
-
-                  {/* Primary button */}
-                  <Pressable
-                    onPressIn={handlePressIn}
-                    onPressOut={handlePressOut}
-                    onPress={isSignIn ? handleSignIn : handleSignUp}
-                    disabled={loading}
+                {/* Primary button */}
+                <Pressable
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  onPress={isSignIn ? handleSignIn : handleSignUp}
+                  disabled={loading}
+                >
+                  <Animated.View
+                    style={[
+                      styles.button,
+                      {
+                        transform: [{ scale: buttonScale }],
+                        opacity: loading ? 0.7 : 1,
+                      },
+                    ]}
                   >
-                    <Animated.View
-                      style={[
-                        styles.button,
-                        {
-                          transform: [{ scale: buttonScale }],
-                          opacity: loading ? 0.7 : 1,
-                        },
-                      ]}
-                    >
-                      <Text style={styles.buttonText}>
-                        {loading
-                          ? isSignIn
-                            ? "Signing in…"
-                            : "Creating account…"
-                          : isSignIn
-                            ? "Sign In"
-                            : "Create Account"}
-                      </Text>
-                      {!loading && <Text style={styles.buttonArrow}>→</Text>}
-                    </Animated.View>
-                  </Pressable>
+                    <Text style={styles.buttonText}>
+                      {loading
+                        ? isSignIn
+                          ? "Signing in…"
+                          : "Creating account…"
+                        : isSignIn
+                          ? "Sign In"
+                          : "Create Account"}
+                    </Text>
+                    {!loading && <Text style={styles.buttonArrow}>→</Text>}
+                  </Animated.View>
+                </Pressable>
 
-                  {/* Divider */}
-                  <View style={styles.divider}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>or</Text>
-                    <View style={styles.dividerLine} />
-                  </View>
-
-                  {/* Google */}
-                  <GoogleSignInButton
-                    onPress={handleGoogleLogin}
-                    loading={googleLoading}
-                  />
+                {/* Divider */}
+                <View style={styles.divider}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>or</Text>
+                  <View style={styles.dividerLine} />
                 </View>
-              </Animated.View>
-            </View>
-          </KeyboardAvoidingView>
-        </ScrollView>
+
+                {/* Google */}
+                <GoogleSignInButton
+                  onPress={handleGoogleLogin}
+                  loading={googleLoading}
+                />
+              </View>
+            </Animated.View>
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   );
