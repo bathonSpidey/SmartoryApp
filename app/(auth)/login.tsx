@@ -26,6 +26,8 @@ import { styles } from "../../styles/login.styles";
 
 type Tab = "signin" | "signup";
 
+const ts = () => new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
+
 export default function LoginScreen() {
   const [tab, setTab] = useState<Tab>("signin");
   const [email, setEmail] = useState("");
@@ -39,12 +41,15 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
   const router = useRouter();
   const cardAnim = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
 
   console.log(
-    "[Login] render — tab:",
+    `[Login][${ts()}] render #${renderCount.current} — tab:`,
     tab,
     "emailFocused:",
     emailFocused,
@@ -56,20 +61,31 @@ export default function LoginScreen() {
 
   // Card entry
   useEffect(() => {
-    console.log("[Login] mounted");
+    console.log(
+      `[Login][${ts()}] mounted — Platform: ${Platform.OS} ${Platform.Version}`,
+    );
     Animated.timing(cardAnim, {
       toValue: 1,
       duration: 750,
       delay: 300,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
-    }).start();
-    return () => console.log("[Login] unmounted");
+    }).start(({ finished }) =>
+      console.log(`[Login][${ts()}] cardAnim finished:`, finished),
+    );
+    return () => console.log(`[Login][${ts()}] unmounted`);
   }, []);
+
+  // Track focus state changes
+  useEffect(() => {
+    console.log(
+      `[Login][${ts()}] focus state changed — email:${emailFocused} pass:${passFocused} confirm:${confirmFocused}`,
+    );
+  }, [emailFocused, passFocused, confirmFocused]);
 
   // Tab slide indicator
   const switchTab = (next: Tab) => {
-    console.log("[Login] switchTab:", tab, "→", next);
+    console.log(`[Login][${ts()}] switchTab:`, tab, "→", next);
     setTab(next);
     setEmail("");
     setPassword("");
@@ -105,12 +121,14 @@ export default function LoginScreen() {
     }
     try {
       setLoading(true);
-      console.log("[Login] calling loginWithEmail...");
+      console.log(`[Login][${ts()}] calling loginWithEmail...`);
       await loginWithEmail(email, password);
-      console.log("[Login] loginWithEmail success — navigating to /(tabs)");
+      console.log(
+        `[Login][${ts()}] loginWithEmail success — navigating to /(tabs)`,
+      );
       router.replace("/(tabs)");
     } catch (err: any) {
-      console.log("[Login] loginWithEmail error:", err.message);
+      console.log(`[Login][${ts()}] loginWithEmail error:`, err.message);
       Alert.alert("Sign in failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -132,7 +150,7 @@ export default function LoginScreen() {
       return;
     }
     if (password !== confirmPassword) {
-      console.log("[Login] passwords do not match");
+      console.log(`[Login][${ts()}] passwords do not match`);
       Alert.alert(
         "Passwords don't match",
         "Please make sure both passwords are the same.",
@@ -140,7 +158,7 @@ export default function LoginScreen() {
       return;
     }
     if (password.length < 6) {
-      console.log("[Login] password too short:", password.length);
+      console.log(`[Login][${ts()}] password too short:`, password.length);
       Alert.alert(
         "Password too short",
         "Password must be at least 6 characters.",
@@ -167,7 +185,7 @@ export default function LoginScreen() {
         );
       }
     } catch (err: any) {
-      console.log("[Login] signUpWithEmail error:", err.message);
+      console.log(`[Login][${ts()}] signUpWithEmail error:`, err.message);
       Alert.alert("Sign up failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -176,17 +194,22 @@ export default function LoginScreen() {
 
   // ── Google ───────────────────────────────────
   const handleGoogleLogin = async () => {
-    console.log("[Login] handleGoogleLogin — start");
+    console.log(`[Login][${ts()}] handleGoogleLogin — start`);
     try {
       setGoogleLoading(true);
       const session = await loginWithGoogle();
-      console.log("[Login] loginWithGoogle result — hasSession:", !!session);
+      console.log(
+        `[Login][${ts()}] loginWithGoogle result — hasSession:`,
+        !!session,
+      );
       if (session) {
-        console.log("[Login] google session active — navigating to /(tabs)");
+        console.log(
+          `[Login][${ts()}] google session active — navigating to /(tabs)`,
+        );
         router.replace("/(tabs)");
       }
     } catch (err: any) {
-      console.log("[Login] loginWithGoogle error:", err.message);
+      console.log(`[Login][${ts()}] loginWithGoogle error:`, err.message);
       Alert.alert(
         "Google sign in failed",
         err.message ?? "Something went wrong.",
@@ -300,11 +323,11 @@ export default function LoginScreen() {
                       autoComplete="off"
                       importantForAutofill="no"
                       onFocus={() => {
-                        console.log("[Login] email → FOCUSED");
+                        console.log(`[Login][${ts()}] email → FOCUSED`);
                         setEmailFocused(true);
                       }}
                       onBlur={() => {
-                        console.log("[Login] email → BLURRED");
+                        console.log(`[Login][${ts()}] email → BLURRED`);
                         setEmailFocused(false);
                       }}
                     />
@@ -339,11 +362,11 @@ export default function LoginScreen() {
                       autoComplete="off"
                       importantForAutofill="no"
                       onFocus={() => {
-                        console.log("[Login] password → FOCUSED");
+                        console.log(`[Login][${ts()}] password → FOCUSED`);
                         setPassFocused(true);
                       }}
                       onBlur={() => {
-                        console.log("[Login] password → BLURRED");
+                        console.log(`[Login][${ts()}] password → BLURRED`);
                         setPassFocused(false);
                       }}
                     />
@@ -387,11 +410,15 @@ export default function LoginScreen() {
                         autoComplete="off"
                         importantForAutofill="no"
                         onFocus={() => {
-                          console.log("[Login] confirmPassword → FOCUSED");
+                          console.log(
+                            `[Login][${ts()}] confirmPassword → FOCUSED`,
+                          );
                           setConfirmFocused(true);
                         }}
                         onBlur={() => {
-                          console.log("[Login] confirmPassword → BLURRED");
+                          console.log(
+                            `[Login][${ts()}] confirmPassword → BLURRED`,
+                          );
                           setConfirmFocused(false);
                         }}
                       />
