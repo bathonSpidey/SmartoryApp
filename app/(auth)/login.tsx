@@ -5,7 +5,6 @@ import {
   Alert,
   Animated,
   Easing,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -27,8 +26,6 @@ import { styles } from "../../styles/login.styles";
 
 type Tab = "signin" | "signup";
 
-const ts = () => new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
-
 export default function LoginScreen() {
   const [tab, setTab] = useState<Tab>("signin");
   const [email, setEmail] = useState("");
@@ -42,76 +39,26 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const renderCount = useRef(0);
-  renderCount.current += 1;
-
   const router = useRouter();
   const cardAnim = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
 
-  console.log(
-    `[Login][${ts()}] render #${renderCount.current} — tab:`,
-    tab,
-    "emailFocused:",
-    emailFocused,
-    "passFocused:",
-    passFocused,
-    "confirmFocused:",
-    confirmFocused,
-  );
+  // Refs for keyboard "Next" chaining
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
 
   // Card entry
   useEffect(() => {
-    console.log(
-      `[Login][${ts()}] mounted — Platform: ${Platform.OS} ${Platform.Version}`,
-    );
     Animated.timing(cardAnim, {
       toValue: 1,
       duration: 750,
       delay: 300,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
-    }).start(({ finished }) =>
-      console.log(`[Login][${ts()}] cardAnim finished:`, finished),
-    );
-    return () => console.log(`[Login][${ts()}] unmounted`);
+    }).start();
   }, []);
 
-  // Keyboard event diagnostics
-  useEffect(() => {
-    const showSub = Keyboard.addListener("keyboardDidShow", (e) =>
-      console.log(
-        `[Login][${ts()}] ⌨️  keyboardDidShow height:`,
-        e.endCoordinates.height,
-      ),
-    );
-    const hideSub = Keyboard.addListener("keyboardDidHide", () =>
-      console.log(`[Login][${ts()}] ⌨️  keyboardDidHide`),
-    );
-    const willShowSub = Keyboard.addListener("keyboardWillShow", () =>
-      console.log(`[Login][${ts()}] ⌨️  keyboardWillShow`),
-    );
-    const willHideSub = Keyboard.addListener("keyboardWillHide", () =>
-      console.log(`[Login][${ts()}] ⌨️  keyboardWillHide`),
-    );
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-      willShowSub.remove();
-      willHideSub.remove();
-    };
-  }, []);
-
-  // Track focus state changes
-  useEffect(() => {
-    console.log(
-      `[Login][${ts()}] focus state changed — email:${emailFocused} pass:${passFocused} confirm:${confirmFocused}`,
-    );
-  }, [emailFocused, passFocused, confirmFocused]);
-
-  // Tab slide indicator
   const switchTab = (next: Tab) => {
-    console.log(`[Login][${ts()}] switchTab:`, tab, "→", next);
     setTab(next);
     setEmail("");
     setPassword("");
@@ -135,26 +82,15 @@ export default function LoginScreen() {
 
   // ── Sign In ──────────────────────────────────
   const handleSignIn = async () => {
-    console.log(
-      "[Login] handleSignIn — email:",
-      email,
-      "hasPassword:",
-      !!password,
-    );
     if (!email || !password) {
       Alert.alert("Missing fields", "Please enter your email and password.");
       return;
     }
     try {
       setLoading(true);
-      console.log(`[Login][${ts()}] calling loginWithEmail...`);
       await loginWithEmail(email, password);
-      console.log(
-        `[Login][${ts()}] loginWithEmail success — navigating to /(tabs)`,
-      );
       router.replace("/(tabs)");
     } catch (err: any) {
-      console.log(`[Login][${ts()}] loginWithEmail error:`, err.message);
       Alert.alert("Sign in failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -163,20 +99,11 @@ export default function LoginScreen() {
 
   // ── Sign Up ──────────────────────────────────
   const handleSignUp = async () => {
-    console.log(
-      "[Login] handleSignUp — email:",
-      email,
-      "hasPassword:",
-      !!password,
-      "hasConfirm:",
-      !!confirmPassword,
-    );
     if (!email || !password || !confirmPassword) {
       Alert.alert("Missing fields", "Please fill in all fields.");
       return;
     }
     if (password !== confirmPassword) {
-      console.log(`[Login][${ts()}] passwords do not match`);
       Alert.alert(
         "Passwords don't match",
         "Please make sure both passwords are the same.",
@@ -184,7 +111,6 @@ export default function LoginScreen() {
       return;
     }
     if (password.length < 6) {
-      console.log(`[Login][${ts()}] password too short:`, password.length);
       Alert.alert(
         "Password too short",
         "Password must be at least 6 characters.",
@@ -193,17 +119,10 @@ export default function LoginScreen() {
     }
     try {
       setLoading(true);
-      console.log("[Login] calling signUpWithEmail...");
       const result = await signUpWithEmail(email, password);
-      console.log(
-        "[Login] signUpWithEmail result — hasSession:",
-        !!result.session,
-      );
       if (result.session) {
-        console.log("[Login] session active — navigating to /(tabs)");
         router.replace("/(tabs)");
       } else {
-        console.log("[Login] email confirmation required");
         Alert.alert(
           "Check your email",
           "We've sent you a confirmation link. Click it to activate your account.",
@@ -211,7 +130,6 @@ export default function LoginScreen() {
         );
       }
     } catch (err: any) {
-      console.log(`[Login][${ts()}] signUpWithEmail error:`, err.message);
       Alert.alert("Sign up failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -220,22 +138,11 @@ export default function LoginScreen() {
 
   // ── Google ───────────────────────────────────
   const handleGoogleLogin = async () => {
-    console.log(`[Login][${ts()}] handleGoogleLogin — start`);
     try {
       setGoogleLoading(true);
       const session = await loginWithGoogle();
-      console.log(
-        `[Login][${ts()}] loginWithGoogle result — hasSession:`,
-        !!session,
-      );
-      if (session) {
-        console.log(
-          `[Login][${ts()}] google session active — navigating to /(tabs)`,
-        );
-        router.replace("/(tabs)");
-      }
+      if (session) router.replace("/(tabs)");
     } catch (err: any) {
-      console.log(`[Login][${ts()}] loginWithGoogle error:`, err.message);
       Alert.alert(
         "Google sign in failed",
         err.message ?? "Something went wrong.",
@@ -346,16 +253,15 @@ export default function LoginScreen() {
                       onChangeText={setEmail}
                       autoCapitalize="none"
                       keyboardType="email-address"
-                      autoComplete="off"
-                      importantForAutofill="no"
-                      onFocus={() => {
-                        console.log(`[Login][${ts()}] email → FOCUSED`);
-                        setEmailFocused(true);
-                      }}
-                      onBlur={() => {
-                        console.log(`[Login][${ts()}] email → BLURRED`);
-                        setEmailFocused(false);
-                      }}
+                      // Sign-in: "username" lets Credential Manager fill saved credentials
+                      // Sign-up: "email" tells the OS this is a new account email
+                      autoComplete={isSignIn ? "username" : "email"}
+                      textContentType={isSignIn ? "username" : "emailAddress"}
+                      returnKeyType="next"
+                      onSubmitEditing={() => passwordRef.current?.focus()}
+                      blurOnSubmit={false}
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
                     />
                   </View>
                 </View>
@@ -379,22 +285,28 @@ export default function LoginScreen() {
                       style={{ width: 16, textAlign: "center" }}
                     />
                     <TextInput
+                      ref={passwordRef}
                       style={styles.input}
                       placeholder="••••••••••"
                       placeholderTextColor="#4b7b78"
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={!showPassword}
-                      autoComplete="off"
-                      importantForAutofill="no"
-                      onFocus={() => {
-                        console.log(`[Login][${ts()}] password → FOCUSED`);
-                        setPassFocused(true);
-                      }}
-                      onBlur={() => {
-                        console.log(`[Login][${ts()}] password → BLURRED`);
-                        setPassFocused(false);
-                      }}
+                      // Sign-in: "current-password" = fill existing credential
+                      // Sign-up: "new-password" = OS won't suggest existing passwords
+                      autoComplete={
+                        isSignIn ? "current-password" : "new-password"
+                      }
+                      textContentType={isSignIn ? "password" : "newPassword"}
+                      returnKeyType={isSignIn ? "done" : "next"}
+                      onSubmitEditing={() =>
+                        isSignIn
+                          ? handleSignIn()
+                          : confirmPasswordRef.current?.focus()
+                      }
+                      blurOnSubmit={isSignIn}
+                      onFocus={() => setPassFocused(true)}
+                      onBlur={() => setPassFocused(false)}
                     />
                     <Pressable
                       onPress={() => setShowPassword((v) => !v)}
@@ -427,26 +339,19 @@ export default function LoginScreen() {
                         style={{ width: 16, textAlign: "center" }}
                       />
                       <TextInput
+                        ref={confirmPasswordRef}
                         style={styles.input}
                         placeholder="••••••••••"
                         placeholderTextColor="#4b7b78"
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={!showConfirmPassword}
-                        autoComplete="off"
-                        importantForAutofill="no"
-                        onFocus={() => {
-                          console.log(
-                            `[Login][${ts()}] confirmPassword → FOCUSED`,
-                          );
-                          setConfirmFocused(true);
-                        }}
-                        onBlur={() => {
-                          console.log(
-                            `[Login][${ts()}] confirmPassword → BLURRED`,
-                          );
-                          setConfirmFocused(false);
-                        }}
+                        autoComplete="new-password"
+                        textContentType="newPassword"
+                        returnKeyType="done"
+                        onSubmitEditing={handleSignUp}
+                        onFocus={() => setConfirmFocused(true)}
+                        onBlur={() => setConfirmFocused(false)}
                       />
                       <Pressable
                         onPress={() => setShowConfirmPassword((v) => !v)}
