@@ -43,8 +43,20 @@ export default function LoginScreen() {
   const cardAnim = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
 
+  console.log(
+    "[Login] render — tab:",
+    tab,
+    "emailFocused:",
+    emailFocused,
+    "passFocused:",
+    passFocused,
+    "confirmFocused:",
+    confirmFocused,
+  );
+
   // Card entry
   useEffect(() => {
+    console.log("[Login] mounted");
     Animated.timing(cardAnim, {
       toValue: 1,
       duration: 750,
@@ -52,10 +64,12 @@ export default function LoginScreen() {
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
+    return () => console.log("[Login] unmounted");
   }, []);
 
   // Tab slide indicator
   const switchTab = (next: Tab) => {
+    console.log("[Login] switchTab:", tab, "→", next);
     setTab(next);
     setEmail("");
     setPassword("");
@@ -79,15 +93,24 @@ export default function LoginScreen() {
 
   // ── Sign In ──────────────────────────────────
   const handleSignIn = async () => {
+    console.log(
+      "[Login] handleSignIn — email:",
+      email,
+      "hasPassword:",
+      !!password,
+    );
     if (!email || !password) {
       Alert.alert("Missing fields", "Please enter your email and password.");
       return;
     }
     try {
       setLoading(true);
+      console.log("[Login] calling loginWithEmail...");
       await loginWithEmail(email, password);
+      console.log("[Login] loginWithEmail success — navigating to /(tabs)");
       router.replace("/(tabs)");
     } catch (err: any) {
+      console.log("[Login] loginWithEmail error:", err.message);
       Alert.alert("Sign in failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -96,11 +119,20 @@ export default function LoginScreen() {
 
   // ── Sign Up ──────────────────────────────────
   const handleSignUp = async () => {
+    console.log(
+      "[Login] handleSignUp — email:",
+      email,
+      "hasPassword:",
+      !!password,
+      "hasConfirm:",
+      !!confirmPassword,
+    );
     if (!email || !password || !confirmPassword) {
       Alert.alert("Missing fields", "Please fill in all fields.");
       return;
     }
     if (password !== confirmPassword) {
+      console.log("[Login] passwords do not match");
       Alert.alert(
         "Passwords don't match",
         "Please make sure both passwords are the same.",
@@ -108,6 +140,7 @@ export default function LoginScreen() {
       return;
     }
     if (password.length < 6) {
+      console.log("[Login] password too short:", password.length);
       Alert.alert(
         "Password too short",
         "Password must be at least 6 characters.",
@@ -116,12 +149,17 @@ export default function LoginScreen() {
     }
     try {
       setLoading(true);
+      console.log("[Login] calling signUpWithEmail...");
       const result = await signUpWithEmail(email, password);
+      console.log(
+        "[Login] signUpWithEmail result — hasSession:",
+        !!result.session,
+      );
       if (result.session) {
-        // Email confirmation disabled in Supabase → go straight in
+        console.log("[Login] session active — navigating to /(tabs)");
         router.replace("/(tabs)");
       } else {
-        // Email confirmation required
+        console.log("[Login] email confirmation required");
         Alert.alert(
           "Check your email",
           "We've sent you a confirmation link. Click it to activate your account.",
@@ -129,6 +167,7 @@ export default function LoginScreen() {
         );
       }
     } catch (err: any) {
+      console.log("[Login] signUpWithEmail error:", err.message);
       Alert.alert("Sign up failed", err.message ?? "Something went wrong.");
     } finally {
       setLoading(false);
@@ -137,11 +176,17 @@ export default function LoginScreen() {
 
   // ── Google ───────────────────────────────────
   const handleGoogleLogin = async () => {
+    console.log("[Login] handleGoogleLogin — start");
     try {
       setGoogleLoading(true);
       const session = await loginWithGoogle();
-      if (session) router.replace("/(tabs)");
+      console.log("[Login] loginWithGoogle result — hasSession:", !!session);
+      if (session) {
+        console.log("[Login] google session active — navigating to /(tabs)");
+        router.replace("/(tabs)");
+      }
     } catch (err: any) {
+      console.log("[Login] loginWithGoogle error:", err.message);
       Alert.alert(
         "Google sign in failed",
         err.message ?? "Something went wrong.",
@@ -252,8 +297,14 @@ export default function LoginScreen() {
                       onChangeText={setEmail}
                       autoCapitalize="none"
                       keyboardType="email-address"
-                      onFocus={() => setEmailFocused(true)}
-                      onBlur={() => setEmailFocused(false)}
+                      onFocus={() => {
+                        console.log("[Login] email → FOCUSED");
+                        setEmailFocused(true);
+                      }}
+                      onBlur={() => {
+                        console.log("[Login] email → BLURRED");
+                        setEmailFocused(false);
+                      }}
                     />
                   </View>
                 </View>
@@ -283,8 +334,14 @@ export default function LoginScreen() {
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={!showPassword}
-                      onFocus={() => setPassFocused(true)}
-                      onBlur={() => setPassFocused(false)}
+                      onFocus={() => {
+                        console.log("[Login] password → FOCUSED");
+                        setPassFocused(true);
+                      }}
+                      onBlur={() => {
+                        console.log("[Login] password → BLURRED");
+                        setPassFocused(false);
+                      }}
                     />
                     <Pressable
                       onPress={() => setShowPassword((v) => !v)}
@@ -323,8 +380,14 @@ export default function LoginScreen() {
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
                         secureTextEntry={!showConfirmPassword}
-                        onFocus={() => setConfirmFocused(true)}
-                        onBlur={() => setConfirmFocused(false)}
+                        onFocus={() => {
+                          console.log("[Login] confirmPassword → FOCUSED");
+                          setConfirmFocused(true);
+                        }}
+                        onBlur={() => {
+                          console.log("[Login] confirmPassword → BLURRED");
+                          setConfirmFocused(false);
+                        }}
                       />
                       <Pressable
                         onPress={() => setShowConfirmPassword((v) => !v)}
