@@ -4,7 +4,9 @@
 //  from the /analysis/today endpoint.
 // ─────────────────────────────────────────────
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL!;
+import Constants from "expo-constants";
+
+const BASE_URL = Constants.expoConfig?.extra?.baseUrl;
 
 // ─── Types ────────────────────────────────────
 

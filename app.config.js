@@ -1,0 +1,56 @@
+import 'dotenv/config';
+
+export default {
+    expo: {
+        name: "smartory-app",
+        slug: "smartory-app",
+        version: "1.0.0",
+        orientation: "portrait",
+        icon: "./assets/images/icon.png",
+        scheme: "smartoryapp",
+        userInterfaceStyle: "automatic",
+        newArchEnabled: true,
+        splash: {
+            image: "./assets/images/splash-icon.png",
+            resizeMode: "contain",
+            backgroundColor: "#ffffff"
+        },
+        ios: {
+            supportsTablet: true,
+            bundleIdentifier: "com.roboinno.smartory"
+        },
+        android: {
+            adaptiveIcon: {
+                foregroundImage: "./assets/images/adaptive-icon.png",
+                backgroundColor: "#ffffff"
+            },
+            edgeToEdgeEnabled: true,
+            predictiveBackGestureEnabled: false,
+            softwareKeyboardLayoutMode: "pan",
+            package: "com.roboinno.smartory"
+        },
+        web: {
+            bundler: "metro",
+            output: "static",
+            favicon: "./assets/images/favicon.png"
+        },
+        plugins: [
+            "expo-router",
+            "expo-web-browser",
+            "./plugins/withAutofillFix"
+        ],
+        experiments: {
+            typedRoutes: true
+        },
+        extra: {
+            // Professional Injection:
+            supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
+            supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+            baseUrl: process.env.EXPO_PUBLIC_BASE_URL,
+            eas: {
+                projectId: "7cbd6b79-d7cd-4002-9def-8efd3f8834f9"
+            }
+        },
+        owner: "spidey22"
+    }
+};

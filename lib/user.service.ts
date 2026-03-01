@@ -3,7 +3,9 @@
 //  Manages user-level preferences via the API.
 // ─────────────────────────────────────────────
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL!;
+import Constants from "expo-constants";
+
+const BASE_URL = Constants.expoConfig?.extra?.baseUrl;
 
 import { CurrencyCode } from "@/constants/currencies";
 export type { CurrencyCode };

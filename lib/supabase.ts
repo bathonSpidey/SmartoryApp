@@ -1,18 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+const SUPABASE_URL = Constants.expoConfig?.extra?.supabaseUrl;
+const SUPABASE_ANON_KEY = Constants.expoConfig?.extra?.supabaseAnonKey;
 
-// AsyncStorage references `window` at import time on web/SSR environments.
-// Using Platform-aware storage prevents the "window is not defined" crash
-// when Metro evaluates this module during bundling.
-const storage = Platform.OS === "web" ? undefined : AsyncStorage;
+// Professional teams use a "Shaped" storage object
+const customStorage = {
+  getItem: (key: string) => AsyncStorage.getItem(key),
+  setItem: (key: string, value: string) => AsyncStorage.setItem(key, value),
+  removeItem: (key: string) => AsyncStorage.removeItem(key),
+};
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+export const supabase = createClient(SUPABASE_URL!, SUPABASE_ANON_KEY!, {
   auth: {
-    storage,
+    // Only use the custom storage on mobile
+    storage: Platform.OS === "web" ? undefined : customStorage,
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

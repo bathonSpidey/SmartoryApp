@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -24,30 +25,40 @@ import {
 } from "../../lib/auth.service";
 import { styles } from "../../styles/login.styles";
 
-type Tab = "signin" | "signup";
+// Memoize the Brand section to prevent re-renders during typing
+const BrandSection = memo(() => (
+  <View style={styles.brandSection}>
+    <View style={styles.logoRow}>
+      <IsoCube size={42} />
+      <Text style={styles.logoText}>Smartory</Text>
+    </View>
+    <Text style={styles.tagline}>Inventory,{"\n"}simplified.</Text>
+    <View style={styles.statsRow}>
+      <StatPill label="Real-time updates" value="Live Stock" delay={500} />
+      <StatPill label="Low inventory" value="Smart Alerts" delay={700} />
+      <StatPill label="Multi-location" value="All in one" delay={900} />
+    </View>
+  </View>
+));
 
 export default function LoginScreen() {
-  const [tab, setTab] = useState<Tab>("signin");
+  const [tab, setTab] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passFocused, setPassFocused] = useState(false);
-  const [confirmFocused, setConfirmFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
   const cardAnim = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
 
   // Refs for keyboard "Next" chaining
+  const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
 
-  // Card entry
   useEffect(() => {
     Animated.timing(cardAnim, {
       toValue: 1,
@@ -58,139 +69,58 @@ export default function LoginScreen() {
     }).start();
   }, []);
 
-  const switchTab = (next: Tab) => {
-    setTab(next);
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-  };
+  const isSignIn = tab === "signin";
 
-  const handlePressIn = () =>
-    Animated.spring(buttonScale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-    }).start();
-
-  const handlePressOut = () =>
-    Animated.spring(buttonScale, {
-      toValue: 1,
-      friction: 4,
-      useNativeDriver: true,
-    }).start();
-
-  // ── Sign In ──────────────────────────────────
-  const handleSignIn = async () => {
+  const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert("Missing fields", "Please enter your email and password.");
+      Alert.alert("Required", "Please fill in all fields.");
       return;
     }
-    try {
-      setLoading(true);
-      await loginWithEmail(email, password);
-      router.replace("/(tabs)");
-    } catch (err: any) {
-      Alert.alert("Sign in failed", err.message ?? "Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // ── Sign Up ──────────────────────────────────
-  const handleSignUp = async () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert("Missing fields", "Please fill in all fields.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert(
-        "Passwords don't match",
-        "Please make sure both passwords are the same.",
-      );
-      return;
-    }
-    if (password.length < 6) {
-      Alert.alert(
-        "Password too short",
-        "Password must be at least 6 characters.",
-      );
-      return;
-    }
+    setLoading(true);
     try {
-      setLoading(true);
-      const result = await signUpWithEmail(email, password);
-      if (result.session) {
+      if (isSignIn) {
+        await loginWithEmail(email, password);
         router.replace("/(tabs)");
       } else {
-        Alert.alert(
-          "Check your email",
-          "We've sent you a confirmation link. Click it to activate your account.",
-          [{ text: "Got it", onPress: () => switchTab("signin") }],
-        );
+        if (password !== confirmPassword)
+          throw new Error("Passwords do not match.");
+        await signUpWithEmail(email, password);
+        Alert.alert("Check email", "Confirmation link sent.");
       }
     } catch (err: any) {
-      Alert.alert("Sign up failed", err.message ?? "Something went wrong.");
+      Alert.alert("Error", err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ── Google ───────────────────────────────────
   const handleGoogleLogin = async () => {
     try {
       setGoogleLoading(true);
       const session = await loginWithGoogle();
       if (session) router.replace("/(tabs)");
     } catch (err: any) {
-      Alert.alert(
-        "Google sign in failed",
-        err.message ?? "Something went wrong.",
-      );
+      Alert.alert("Error", err.message);
     } finally {
       setGoogleLoading(false);
     }
   };
 
-  const isSignIn = tab === "signin";
-
   return (
     <View style={styles.container}>
       <AmbientBackground />
-
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          <View style={styles.scrollContent}>
-            {/* ── Brand ── */}
-            <View style={styles.brandSection}>
-              <View style={styles.logoRow}>
-                <IsoCube size={42} />
-                <Text style={styles.logoText}>Smartory</Text>
-              </View>
-              <Text style={styles.tagline}>Inventory,{"\n"}simplified.</Text>
-              <View style={styles.statsRow}>
-                <StatPill
-                  label="Real-time updates"
-                  value="Live Stock"
-                  delay={500}
-                />
-                <StatPill
-                  label="Low inventory"
-                  value="Smart Alerts"
-                  delay={700}
-                />
-                <StatPill
-                  label="Multi-location"
-                  value="All in one"
-                  delay={900}
-                />
-              </View>
-            </View>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <BrandSection />
 
-            {/* ── Card ── */}
             <Animated.View
               style={[
                 styles.card,
@@ -207,45 +137,36 @@ export default function LoginScreen() {
                 },
               ]}
             >
-              {/* Tab switcher */}
+              {/* Tab Switcher */}
               <View style={styles.tabRow}>
-                <Pressable
-                  style={[styles.tabItem, isSignIn && styles.tabItemActive]}
-                  onPress={() => switchTab("signin")}
-                >
-                  <Text
-                    style={[styles.tabLabel, isSignIn && styles.tabLabelActive]}
+                {(["signin", "signup"] as const).map((t) => (
+                  <Pressable
+                    key={t}
+                    style={[styles.tabItem, tab === t && styles.tabItemActive]}
+                    onPress={() => setTab(t)}
                   >
-                    Sign In
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.tabItem, !isSignIn && styles.tabItemActive]}
-                  onPress={() => switchTab("signup")}
-                >
-                  <Text
-                    style={[
-                      styles.tabLabel,
-                      !isSignIn && styles.tabLabelActive,
-                    ]}
-                  >
-                    Sign Up
-                  </Text>
-                </Pressable>
+                    <Text
+                      style={[
+                        styles.tabLabel,
+                        tab === t && styles.tabLabelActive,
+                      ]}
+                    >
+                      {t === "signin" ? "Sign In" : "Sign Up"}
+                    </Text>
+                  </Pressable>
+                ))}
               </View>
 
               <View style={styles.form}>
-                {/* Email */}
-                <View style={styles.fieldGroup}>
+                {/* Email Field */}
+                <View style={styles.fieldGroup} pointerEvents="box-none">
                   <Text style={styles.fieldLabel}>Email</Text>
-                  <View
-                    style={[
-                      styles.inputWrap,
-                      emailFocused && styles.inputWrapFocused,
-                    ]}
-                  >
-                    <Text style={styles.inputIcon}>@</Text>
+                  <View style={styles.inputContainer}>
+                    <Text style={[styles.inputIcon, { marginLeft: 14 }]}>
+                      @
+                    </Text>
                     <TextInput
+                      ref={emailRef}
                       style={styles.input}
                       placeholder="you@company.com"
                       placeholderTextColor="#4b7b78"
@@ -253,36 +174,30 @@ export default function LoginScreen() {
                       onChangeText={setEmail}
                       autoCapitalize="none"
                       keyboardType="email-address"
-                      // Sign-in: "username" lets Credential Manager fill saved credentials
-                      // Sign-up: "email" tells the OS this is a new account email
                       autoComplete={isSignIn ? "username" : "email"}
                       textContentType={isSignIn ? "username" : "emailAddress"}
                       returnKeyType="next"
                       onSubmitEditing={() => passwordRef.current?.focus()}
                       blurOnSubmit={false}
-                      onFocus={() => setEmailFocused(true)}
-                      onBlur={() => setEmailFocused(false)}
+                      underlineColorAndroid="transparent"
                     />
                   </View>
                 </View>
 
-                {/* Password */}
-                <View style={styles.fieldGroup}>
+                {/* Password Field */}
+                <View style={styles.fieldGroup} pointerEvents="box-none">
                   <View style={styles.fieldLabelRow}>
                     <Text style={styles.fieldLabel}>Password</Text>
-                    {isSignIn && <Text style={styles.forgotLink}>Forgot?</Text>}
+                    {isSignIn ? (
+                      <Text style={styles.forgotLink}>Forgot?</Text>
+                    ) : null}
                   </View>
-                  <View
-                    style={[
-                      styles.inputWrap,
-                      passFocused && styles.inputWrapFocused,
-                    ]}
-                  >
+                  <View style={styles.inputContainer}>
                     <Ionicons
                       name="lock-closed-outline"
                       size={15}
                       color="#3d706a"
-                      style={{ width: 16, textAlign: "center" }}
+                      style={{ marginLeft: 14 }}
                     />
                     <TextInput
                       ref={passwordRef}
@@ -292,8 +207,6 @@ export default function LoginScreen() {
                       value={password}
                       onChangeText={setPassword}
                       secureTextEntry={!showPassword}
-                      // Sign-in: "current-password" = fill existing credential
-                      // Sign-up: "new-password" = OS won't suggest existing passwords
                       autoComplete={
                         isSignIn ? "current-password" : "new-password"
                       }
@@ -301,17 +214,16 @@ export default function LoginScreen() {
                       returnKeyType={isSignIn ? "done" : "next"}
                       onSubmitEditing={() =>
                         isSignIn
-                          ? handleSignIn()
+                          ? handleAuth()
                           : confirmPasswordRef.current?.focus()
                       }
                       blurOnSubmit={isSignIn}
-                      onFocus={() => setPassFocused(true)}
-                      onBlur={() => setPassFocused(false)}
+                      underlineColorAndroid="transparent"
                     />
                     <Pressable
-                      onPress={() => setShowPassword((v) => !v)}
+                      onPress={() => setShowPassword(!showPassword)}
                       style={styles.eyeButton}
-                      hitSlop={8}
+                      hitSlop={15}
                     >
                       <Ionicons
                         name={showPassword ? "eye-outline" : "eye-off-outline"}
@@ -322,21 +234,16 @@ export default function LoginScreen() {
                   </View>
                 </View>
 
-                {/* Confirm Password — Sign Up only */}
-                {!isSignIn && (
-                  <View style={styles.fieldGroup}>
+                {/* Confirm Password (Sign Up Only) */}
+                {!isSignIn ? (
+                  <View style={styles.fieldGroup} pointerEvents="box-none">
                     <Text style={styles.fieldLabel}>Confirm Password</Text>
-                    <View
-                      style={[
-                        styles.inputWrap,
-                        confirmFocused && styles.inputWrapFocused,
-                      ]}
-                    >
+                    <View style={styles.inputContainer}>
                       <Ionicons
                         name="lock-closed-outline"
                         size={15}
                         color="#3d706a"
-                        style={{ width: 16, textAlign: "center" }}
+                        style={{ marginLeft: 14 }}
                       />
                       <TextInput
                         ref={confirmPasswordRef}
@@ -345,77 +252,47 @@ export default function LoginScreen() {
                         placeholderTextColor="#4b7b78"
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
-                        secureTextEntry={!showConfirmPassword}
+                        secureTextEntry={!showPassword}
                         autoComplete="new-password"
                         textContentType="newPassword"
                         returnKeyType="done"
-                        onSubmitEditing={handleSignUp}
-                        onFocus={() => setConfirmFocused(true)}
-                        onBlur={() => setConfirmFocused(false)}
+                        onSubmitEditing={handleAuth}
+                        underlineColorAndroid="transparent"
                       />
-                      <Pressable
-                        onPress={() => setShowConfirmPassword((v) => !v)}
-                        style={styles.eyeButton}
-                        hitSlop={8}
-                      >
-                        <Ionicons
-                          name={
-                            showConfirmPassword
-                              ? "eye-outline"
-                              : "eye-off-outline"
-                          }
-                          size={18}
-                          color="#3d706a"
-                        />
-                      </Pressable>
                     </View>
                   </View>
-                )}
+                ) : null}
 
-                {/* Primary button */}
-                <Pressable
-                  onPressIn={handlePressIn}
-                  onPressOut={handlePressOut}
-                  onPress={isSignIn ? handleSignIn : handleSignUp}
-                  disabled={loading}
-                >
+                <Pressable onPress={handleAuth} disabled={loading}>
                   <Animated.View
-                    style={[
-                      styles.button,
-                      {
-                        transform: [{ scale: buttonScale }],
-                        opacity: loading ? 0.7 : 1,
-                      },
-                    ]}
+                    style={[styles.button, { opacity: loading ? 0.7 : 1 }]}
                   >
                     <Text style={styles.buttonText}>
                       {loading
-                        ? isSignIn
-                          ? "Signing in…"
-                          : "Creating account…"
+                        ? "Processing..."
                         : isSignIn
                           ? "Sign In"
                           : "Create Account"}
                     </Text>
-                    {!loading && <Text style={styles.buttonArrow}>→</Text>}
+                    {!loading ? (
+                      <Text style={styles.buttonArrow}>→</Text>
+                    ) : null}
                   </Animated.View>
                 </Pressable>
 
-                {/* Divider */}
                 <View style={styles.divider}>
                   <View style={styles.dividerLine} />
                   <Text style={styles.dividerText}>or</Text>
                   <View style={styles.dividerLine} />
                 </View>
 
-                {/* Google */}
                 <GoogleSignInButton
                   onPress={handleGoogleLogin}
                   loading={googleLoading}
                 />
               </View>
             </Animated.View>
-          </View>
+          </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </View>

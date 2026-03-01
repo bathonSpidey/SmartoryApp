@@ -173,6 +173,38 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
   },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#071c1a",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: T.tealBorder,
+    height: 48,
+    overflow: "hidden",
+  },
+  input: {
+    flex: 1,
+    color: T.text,
+    fontSize: 15,
+    height: "100%",
+    paddingHorizontal: 14, // Touch area now covers the full width
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
+  },
+  inputIcon: {
+    color: T.textDim,
+    fontSize: 14,
+    marginLeft: 14, // Position the icon separately from the input's padding
+    width: 20,
+    textAlign: "center",
+  },
+  eyeButton: {
+    paddingRight: 14,
+    paddingLeft: 10,
+    height: "100%",
+    justifyContent: "center",
+    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
+  },
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -189,23 +221,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "#09211f",
     boxShadow: "0px 0px 10px rgba(20,184,166,0.18)",
     elevation: 3,
-  },
-  inputIcon: {
-    color: T.textDim,
-    fontSize: 12,
-    width: 16,
-    textAlign: "center",
-  },
-  input: {
-    flex: 1,
-    color: T.text,
-    fontSize: 15,
-    height: "100%",
-    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : {}),
-  },
-  eyeButton: {
-    padding: 4,
-    ...(Platform.OS === "web" ? ({ cursor: "pointer" } as any) : {}),
   },
 
   // ── Button ────────────────────────────────
