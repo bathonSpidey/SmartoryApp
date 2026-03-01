@@ -5,6 +5,7 @@ import {
   Alert,
   Animated,
   Easing,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -74,6 +75,31 @@ export default function LoginScreen() {
       console.log(`[Login][${ts()}] cardAnim finished:`, finished),
     );
     return () => console.log(`[Login][${ts()}] unmounted`);
+  }, []);
+
+  // Keyboard event diagnostics
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) =>
+      console.log(
+        `[Login][${ts()}] ⌨️  keyboardDidShow height:`,
+        e.endCoordinates.height,
+      ),
+    );
+    const hideSub = Keyboard.addListener("keyboardDidHide", () =>
+      console.log(`[Login][${ts()}] ⌨️  keyboardDidHide`),
+    );
+    const willShowSub = Keyboard.addListener("keyboardWillShow", () =>
+      console.log(`[Login][${ts()}] ⌨️  keyboardWillShow`),
+    );
+    const willHideSub = Keyboard.addListener("keyboardWillHide", () =>
+      console.log(`[Login][${ts()}] ⌨️  keyboardWillHide`),
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+      willShowSub.remove();
+      willHideSub.remove();
+    };
   }, []);
 
   // Track focus state changes
