@@ -7,8 +7,7 @@ WebBrowser.maybeCompleteAuthSession();
 // ── Email / Password sign in ──────────────────
 
 export async function loginWithEmail(email: string, password: string) {
-  console.log("Attempting login with email:", email);
-  console.log("Pass:", password);
+
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim().toLowerCase(),

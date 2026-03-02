@@ -6,7 +6,6 @@
 import Constants from "expo-constants";
 
 const BASE_URL = Constants.expoConfig?.extra?.baseUrl;
-console.log("Agents Service initialized with BASE_URL:", BASE_URL);
 
 export type AgentType =
   | "extractor"
