@@ -253,7 +253,7 @@ export default function PreferencesScreen() {
                   },
                 ]}
               >
-                Food Categories
+                Your Categories
               </Text>
               {categories.length > 0 && (
                 <View

@@ -32,7 +32,8 @@ export default {
         web: {
             bundler: "metro",
             output: "static",
-            favicon: "./assets/images/favicon.png"
+            favicon: "./assets/images/favicon.png",
+            description: "Smartory is an AI-powered inventory optimiser app for household and business use. It helps users manage their inventory efficiently by providing insights and recommendations based on their usage patterns and preferences."
         },
         plugins: [
             "expo-router",
